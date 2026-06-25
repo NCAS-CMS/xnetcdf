@@ -1,0 +1,6 @@
+/* Force code block captions to be left-aligned */
+.rst-content .code-block-caption, 
+.rst-content p.caption {
+    text-align: left !important;
+    padding-left: 0px !important;
+}

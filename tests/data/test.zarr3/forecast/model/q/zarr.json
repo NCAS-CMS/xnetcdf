@@ -1,0 +1,117 @@
+{
+  "shape": [
+    5,
+    8
+  ],
+  "data_type": "float32",
+  "chunk_grid": {
+    "name": "regular",
+    "configuration": {
+      "chunk_shape": [
+        5,
+        3
+      ]
+    }
+  },
+  "chunk_key_encoding": {
+    "name": "default",
+    "configuration": {
+      "separator": "/"
+    }
+  },
+  "fill_value": 9.969209968386869e+36,
+  "codecs": [
+    {
+      "name": "bytes",
+      "configuration": {
+        "endian": "little"
+      }
+    },
+    {
+      "name": "zstd",
+      "configuration": {
+        "level": 0,
+        "checksum": false
+      }
+    }
+  ],
+  "attributes": {
+    "list7": [
+      2,
+      3
+    ],
+    "int": 49,
+    "int8": 49,
+    "int16": 49,
+    "int32": 49,
+    "int64": 49,
+    "float": 49.0,
+    "float32": 49.0,
+    "float64": 49.0,
+    "uint8": 49,
+    "uint16": 49,
+    "uint32": 49,
+    "uint64": 49,
+    "list1": [
+      2,
+      3
+    ],
+    "list2": [
+      2,
+      3
+    ],
+    "list3": [
+      2,
+      3
+    ],
+    "list4": [
+      2,
+      3
+    ],
+    "list5": [
+      2.0,
+      3.0
+    ],
+    "list6": [
+      2.0,
+      3.0
+    ],
+    "list8": 2,
+    "list9": [],
+    "list10": [],
+    "list11": [
+      "a",
+      "bb",
+      "ccc"
+    ],
+    "list12": [
+      "a",
+      "1",
+      "2.5"
+    ],
+    "list13": "a",
+    "list14": [
+      "a",
+      "bb"
+    ],
+    "string1": "1",
+    "string2": "a",
+    "string3": "kg m-2",
+    "string4": "",
+    "string5": " ",
+    "string6": "",
+    "string7": "",
+    "string8": "",
+    "string9": "",
+    "standard_name": "specific_humidity",
+    "coordinates": "time",
+    "cell_methods": "area: mean"
+  },
+  "dimension_names": [
+    "/forecast/model/lat",
+    "/forecast/lon"
+  ],
+  "zarr_format": 3,
+  "node_type": "array",
+  "storage_transformers": []
+}

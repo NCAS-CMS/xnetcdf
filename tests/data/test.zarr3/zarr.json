@@ -1,0 +1,9 @@
+{
+  "attributes": {
+    "Conventions": "CF-1.13",
+    "global_attr_2": "foo",
+    "global_attr_1": 3.14
+  },
+  "zarr_format": 3,
+  "node_type": "group"
+}

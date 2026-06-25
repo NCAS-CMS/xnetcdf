@@ -1,0 +1,8 @@
+{
+  "attributes": {
+    "group_attr_1": 12,
+    "group_attr_2": "bar"
+  },
+  "zarr_format": 3,
+  "node_type": "group"
+}

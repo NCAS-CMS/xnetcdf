@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xnetcdf"
+version = "0.1.0"
+description = "TODO"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "BSD-3-Clause"}
+authors = [
+    {name = "Ppfive Development Team", email = "valeriu.predoi@ncas.ac.uk"},
+    {name = "Valeriu Predoi", email = "valeriu.predoi@ncas.ac.uk"},
+    {name = "David Hassell", email = "david.hassell@ncas.ac.uk"},
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+]
+
+# Core, mandatory dependencies required for the package to import
+dependencies = [
+    "numpy>=2.0.0",
+]
+
+# Optional dependencies (Extras) 
+# Users can install these via: pip install .[all] or pip install .[backends]
+[project.optional-dependencies]
+backends = [
+    "netCDF4",
+    "h5py",
+    "scipy",
+    "pyfive",
+    "ppfive",
+    "zarr",
+    "xarray",
+]
+# A catch-all shortcut to install every optional feature at once
+all = [
+    "netCDF4",
+    "h5py",
+    "scipy",
+    "pyfive",
+    "ppfive",
+    "zarr",
+    "xarray",
+]
+dev = [
+    "pytest",
+    "black",
+    "isort",
+    "pydocstyle",
+]
+
+docs = [
+    "sphinx",
+    "sphinx_rtd_theme",
+]
+
+[tool.black]
+line-length = 79
+
+# Set for compatibility of 'black' and 'isort' auto-formatting tools
+[tool.isort]
+profile = "black"
+# ... and since we set this against the black default line length:
+line_length=79
+# Prevent isort from auto-formatting '__init__.py' file imports because
+# they require a specific non-aphabetical (etc.) ordering else they will
+# cause errors due to bad or circular importing across the modules.
+extend_skip_glob = [
+  "**/__init__.py",
+]
+
+# Prevent message about missing docstring in magic method
+[tool.pydocstyle]
+ignore = "D105"
