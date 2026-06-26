@@ -1,0 +1,28 @@
+---
+name: xnetcdf
+channels:
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  # core dependencies
+  - numpy >=2
+  - python >=3.10
+  # all backends
+  - netCDF4
+  - h5py
+  - scipy
+  - pyfive
+  - ppfive
+  - zarr
+  - xarray
+  # testing and linting
+  - pre-commit  # with ruff and mypy
+  - pytest
+  - pytest-cov
+  - pytest-html
+  - pytest-xdist
+  # documentation dependencies
+  - autodocsumm
+  - sphinx
+  - sphinx_rtd_theme
