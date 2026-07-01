@@ -560,7 +560,10 @@ class Variable(Mixin, Mixin2):
             case "xarray":
                 # Get the numpy array from the Dask array
                 array = array.values
-                
+
+        if not isinstance(array, np.ndarray):
+            array = np.array(array)
+
         return array
 
     def __len__(self):
@@ -1886,17 +1889,17 @@ class Dataset(Group):
             library, because it reduces or removes any unsuccessful
             dataset read attempts, which can be expensive, especially
             for remote datasets.
-    
+
             By default *backend* is `None`, which is equivalent to
             providing the ordered sequence of backends:
-    
+
             ``('pyfive', 'zarr' 'ppfive', 'netCDF4', 'netcdf_file',
             'h5py', 'xarray')``
 
             If the dataset is given as a backend object, then that
             backend must be one of the backends identified by the
             *backend* parameter
-    
+
             The available backends, and the formats they can read,
             are:
 
@@ -1913,7 +1916,7 @@ class Dataset(Group):
                                                        Zarr, Kerchunk,
                                                        GRIB
             =================  ======================  ===================
-    
+
             Note that the `xarray` library is itself an interface to
             other backends.
 
