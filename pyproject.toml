@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "BSD-3-Clause"}
 authors = [
-    {name = "Ppfive Development Team", email = "valeriu.predoi@ncas.ac.uk"},
+    {name = "Xnetcdf Development Team", email = "valeriu.predoi@ncas.ac.uk"},
     {name = "Valeriu Predoi", email = "valeriu.predoi@ncas.ac.uk"},
     {name = "David Hassell", email = "david.hassell@ncas.ac.uk"},
 ]
@@ -33,7 +33,7 @@ backends = [
     "h5py",
     "scipy",
     "pyfive",
-    "ppfive",
+    "umfive",
     "zarr",
     "xarray",
 ]
@@ -43,7 +43,7 @@ all = [
     "h5py",
     "scipy",
     "pyfive",
-    "ppfive",
+    "umfive",
     "zarr",
     "xarray",
 ]

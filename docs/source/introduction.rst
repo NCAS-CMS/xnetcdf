@@ -33,7 +33,7 @@ dataset:
 
 - `pyfive`
 - `zarr`
-- `ppfive`
+- `umfive`
 - `netCDF4`
 - `scipy.io.netcdf_file`
 - `h5py`
@@ -72,10 +72,10 @@ supported backends (shown in brackets) are:
   (`xarray`)
 - `UK Met Office PP
   <https://artefacts.ceda.ac.uk/badc_datadocs/um/umdp_F3-UMDPF3.pdf>`_
-  (`ppfive`)
+  (`umfive`)
 - `UK Met Office fields file
   <https://artefacts.ceda.ac.uk/badc_datadocs/um/umdp_F3-UMDPF3.pdf>`_
-  (`ppfive`)
+  (`umfive`)
 
 Dataset definitions
 ^^^^^^^^^^^^^^^^^^^
@@ -93,7 +93,7 @@ dataset definitions:
   `fsspec.mapping.FSMap`)
 
 - Any of the following allowed backend objects that accesses the
-  dataset: `pyfive.File`, `zarr.Group``ppfive.File`,
+  dataset: `pyfive.File`, `zarr.Group`, `umfive.File`,
   `netCDF4.Dataset`, `scipy.io.netcdf_file`, `h5py.File`,
   `xarray.Dataset`, and `xarray.DataTree`.
 

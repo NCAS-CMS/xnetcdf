@@ -18,7 +18,7 @@ from .utils import (
     netcdf_file_parse_group_structure,
     netcdf_file_read,
     parse_attributes,
-    ppfive_read,
+    umfive_read,
     pyfive_read,
     xarray_parse_group_structure,
     xarray_read,
@@ -36,13 +36,16 @@ from .utils import (
 _read_functions = {
     "pyfive": pyfive_read,
     "zarr": zarr_read,
-    "ppfive": ppfive_read,
+    "umfive": umfive_read,
     "netCDF4": netCDF4_read,
     "netcdf_file": netcdf_file_read,
     "h5py": h5py_read,
     "xarray": xarray_read,
 }
+
 backends = tuple(_read_functions)
+"""Supported backends available for accessing datasets, in the order
+in which access is attempted."""
 
 # np.printoptions parameters for `dump` method output (17 significant
 # digits is enough to fully represent every possible bit of precision
@@ -80,7 +83,7 @@ class Mixin:
 
             `str`
                 The name of the backend API, one of ``'pyfive'``,
-                ``'zarr'``, ``'ppfive'``, ``'netCDF4'``,
+                ``'zarr'``, ``'umfive'``, ``'netCDF4'``,
                 ``'netcdf_file'``, ``'h5py'``, and ``'xarray'``.
 
         """
@@ -115,8 +118,8 @@ class Mixin:
 
         :Returns:
 
-                The dataset definition. May be anything acceped by the
-                *dataset* parameter of `xnetcdf.Dataset`.
+                The dataset definition. May be anything accepted by
+                the *dataset* parameter of `xnetcdf.Dataset`.
 
         """
         return self.root._dataset
@@ -561,6 +564,9 @@ class Variable(Mixin, Mixin2):
                 # Get the numpy array from the Dask array
                 array = array.values
 
+        if not isinstance(array, np.ndarray):
+            array = np.array(array)
+
         return array
 
     def __len__(self):
@@ -631,7 +637,7 @@ class Variable(Mixin, Mixin2):
         chunks = getattr(self, "_chunks", None)
         if chunks is None:
             match self.backend_api:
-                case "pyfive" | "h5py" | "ppfive":
+                case "pyfive" | "h5py" | "umfive":
                     chunks = self._var.chunks
 
                 case "netCDF4":
@@ -714,7 +720,7 @@ class Variable(Mixin, Mixin2):
                     | "netCDF4"
                     | "h5py"
                     | "xarray"
-                    | "ppfive"
+                    | "umfive"
                 ):
                     dtype = self._var.dtype
 
@@ -889,17 +895,17 @@ class Variable(Mixin, Mixin2):
 
             `list` or ``'contiguous'`` or `None`
                 The chunk shape, e.g. ``[5, 6, 7]``. For contiguous
-                data in a dataset that does support chunking,
-                ``'contiguous'`` is returned. If the dataset doesn't
-                support chunking (such as netCDF-3) then `None` is
-                returned.
+                data in a dataset whose format supports chunking,
+                ``'contiguous'`` is returned. If the dataset format
+                doesn't support chunking (such as netCDF-3) then
+                `None` is returned.
 
         """
         chunking = getattr(self, "_chunking", None)
         if chunking is None:
             chunks = self.chunks
             match self.backend_api:
-                case "pyfive" | "zarr" | "xarray" | "h5py" | "ppfive":
+                case "pyfive" | "zarr" | "xarray" | "h5py" | "umfive":
                     if chunks is None:
                         chunking = "contiguous"
                     else:
@@ -1017,7 +1023,7 @@ class Variable(Mixin, Mixin2):
         dims = getattr(self, "_dims", None)
         if dims is None:
             match self.backend_api:
-                case "pyfive" | "h5py" | "ppfive":
+                case "pyfive" | "h5py" | "umfive":
                     dims = get_dimensions_from_defining_group(
                         self, hdf5_dimension_names(self)
                     )
@@ -1407,7 +1413,7 @@ class Group(Mixin, Mixin2, Mapping):
 
         """
         match self.backend_api:
-            case "pyfive" | "h5py" | "ppfive":
+            case "pyfive" | "h5py" | "umfive":
                 hdf5_parse_group_structure(self)
 
             case "netCDF4":
@@ -1452,8 +1458,8 @@ class Group(Mixin, Mixin2, Mapping):
         :Returns:
 
             `dict`
-                The `Dimension` objects, keyed by their names
-                realitive to the group.
+                The `Dimension` objects, keyed by their names relative
+                to the group.
 
         :Examples:
 
@@ -1806,8 +1812,14 @@ class Dataset(Group):
     Supported dataset formats that can be read by at least one of the
     supported backends are: netCDF-4, netCDF-3, Zarr v3, Zarr v2,
     Kerchunk, UK Met Office PP, and UK Met Office fields file.
+    
+    Additionaly, a dataset may be provided as (a subclass of) any of
+    the following backend objects: `pyfive.File`, `zarr.Group`,
+    `umfive.File`, `netCDF4.Dataset`, `scipy.io.netcdf_file`,
+    `h5py.File`, `xarray.Dataset`, and `xarray.DataTree`. See the
+    *dataset* parameter for details.
 
-    :Dataset deinitions:
+    :Dataset definition:
 
     See the *dataset* parameter for the different ways in which a
     dataset can be provided.
@@ -1861,15 +1873,15 @@ class Dataset(Group):
               as `fsspec.mapping.FSMap`)
 
             * Any of the following backend objects (see the *backend*
-              parameter) that accesses the dataset: `pyfive.File`,
-              `zarr.Group`, `ppfive.File`, `netCDF4.Dataset`,
+              parameter) that defines a dataset: `pyfive.File`,
+              `zarr.Group`, `umfive.File`, `netCDF4.Dataset`,
               `scipy.io.netcdf_file`, `h5py.File`, `xarray.Dataset`,
               and `xarray.DataTree`.
 
-            * Any object ``x`` that accesses the dataset and has the
-              same API as one of the allowed backend objects. In
-              pratice, this means any object ``x`` for which
-              ``isinstance(x, <backend-object>)`` is `True` for any
+            * Any object ``x`` that defines a dataset and has the same
+              API as one of the allowed backend objects. In practice,
+              this means any object ``x`` for which ``isinstance(x,
+              <backend-object>)`` is `True` for any
               ``<backend-object>`` from the selection of allowed
               backend objects. For instance, if you have created a
               library called ``my_pyfive`` for which
@@ -1877,25 +1889,35 @@ class Dataset(Group):
               `pyfive.File`, then ``my_pyfive.File`` instances can be
               passed to `Dataset`.
 
-        backend: `None` or (sequence of) `str`, optional
-            Which library or libraries to use for opening a
-            string-like, file-like, or directory-like *dataset*. An
-            attempt to read the dataset is made by the given backends
-            in the order in which they are provided, stopping after
-            the first successful read. Performance may be improved by
-            specifiying a backend library, because it reduces or
-            removes any unsuccessful dataset read attempts, which can
-            be expensive, especially for remote datasets.
+        backend: `None` or (sequence of) `str`,
+            Which library to use for opening a string-like, file-like,
+            or directory-like dataset. An attempt to read the dataset
+            is made by the given backends in the order in which they
+            are provided, stopping after the first successful read.
+            By default *backend* is `None`, which is equivalent to
+            providing the ordered sequence of backends:
+
+            ``('pyfive', 'zarr' 'umfive', 'netCDF4', 'netcdf_file',
+            'h5py', 'xarray')``
+
+            If the dataset is given as a (subclass of a) backend
+            object, then that backend must be one of the backends
+            identified by the *backend* parameter.
+
+            Performance may be improved by specifying a backend
+            library, as this reduces or removes unsuccessful dataset
+            read attempts, which can be expensive, especially for
+            remote datasets.
 
             The available backends, and the formats they can read,
             are:
 
             =================  ======================  ===================
-            Backend            Library                 Formats
+            Backend            Library                 Dataset formats
             =================  ======================  ===================
             ``'pyfive'``       `pyfive`                netCDF-4
             ``'zarr'``         `zarr`                  Zarr, Kerchunk
-            ``'ppfive'``       `ppfive`                PP, fields file
+            ``'umfive'``       `umfive`                PP, fields file
             ``'netCDF4'``      `netCDF4`               netCDF-4, netCDF-3
             ``'netcdf_file'``  `scipy.io.netcdf_file`  netCDF-3
             ``'h5py'``         `h5py`                  netCDF-4
@@ -1904,22 +1926,8 @@ class Dataset(Group):
                                                        GRIB
             =================  ======================  ===================
 
-            By default *backend* is `None`, which is equivalent to
-            providing the ordered sequence of backends:
-
-            ``('pyfive', 'zarr' 'ppfive', 'netCDF4', 'netcdf_file',
-            'h5py', 'xarray')``
-
-            Note that the `xarray` library also uses other backends to
-            access the dataset, which can be configured via the
-            *xarray_options* parameter.
-
-            If *dataset* is given as (a subclass of) a backend object
-            then *backend* should be `None` or include the name of
-            that backend, otherwise an exception will be raised. For
-            instance, if *dataset* is a `pyfive.File` object then
-            *backend* should be `None`, or the string ``'pyfive'``, or
-            be a sequence that includes the string ``'pyfive'``.
+            Note that the `xarray` library is itself an interface to
+            other backends.
 
             *Example:*
               To only attempt ``'netCDF4'``: ``'netCDF4'`` or
@@ -1959,15 +1967,17 @@ class Dataset(Group):
             to `None` (the default) is equivalent to providing an
             empty dictionary. The keyword argument ``mode='r'`` is
             always automatically applied, even when not provided, and
-            can't be set to a different value.
+            can't be set to a different value. The ``filename``
+            argument can not be provided.
 
-        ppfive_options: `dict` or `None`, optional
-            Keyword arguments that are passed to `ppfive.File` when
-            opening a dataset with the ``'ppfive'`` backend. Setting
+        umfive_options: `dict` or `None`, optional
+            Keyword arguments that are passed to `umfive.File` when
+            opening a dataset with the ``'umfive'`` backend. Setting
             to `None` (the default) is equivalent to providing an
             empty dictionary. The keyword argument ``mode='r'`` is
             always automatically applied, even when not provided, and
-            can't be set to a different value.
+            can't be set to a different value. The ``filename``
+            argument can not be provided.
 
         netCDF4_options: `dict` or `None`, optional
             Keyword arguments that are passed to `netCDF4.Dataset`
@@ -1975,7 +1985,8 @@ class Dataset(Group):
             backend. Setting to `None` (the default) is equivalent to
             providing an empty dictionary. The keyword argument
             ``mode='r'`` is always automatically applied, even when
-            not provided, and can't be set to a different value.
+            not provided, and can't be set to a different value. The
+            ``filename`` argument can not be provided.
 
         netcdf_file_options: `dict` or `None`, optional
             Keyword arguments that are passed to
@@ -1984,7 +1995,8 @@ class Dataset(Group):
             is equivalent to providing an empty dictionary. The
             keyword arguments ``mode='r'`` and ``mmap=True`` are
             always automatically applied, even when not provided, and
-            can't be set to different values.
+            can't be set to different values. The ``filename``
+            argument can not be provided.
 
         h5py_options: `dict` or `None`, optional
             Keyword arguments that are passed to `h5py.File` when
@@ -1992,7 +2004,8 @@ class Dataset(Group):
             `None` (the default) is equivalent to providing an empty
             dictionary. The keyword argument ``mode='r'`` is always
             automatically applied, even when not provided, and can't
-            be set to a different value.
+            be set to a different value. The ``name`` argument can not
+            be provided.
 
             It is recommended to set ``rdcc_nbytes``, ``rdcc_w0``, and
             ``rdcc_nslots`` keywords to reduce the risk of poor HDF5
@@ -2005,11 +2018,12 @@ class Dataset(Group):
             `xarray.open_datatree` when opening a dataset with the
             ``'xarray'`` backend. Setting to `None` (the default) is
             equivalent to providing an empty dictionary. The keyword
-            arguments ``mask_and_scale=False, decode_cf=False,
-            chunks='auto'`` are always automatically applied, even
-            when not provided. The first two arguments can't be set to
-            different values, but the third argument (``chunks``) may
-            be modified.
+            arguments ``mask_and_scale=False``, ``decode_cf=False``,
+            and ``chunks='auto'`` are always automatically applied,
+            even when not provided. The ``mask_and_scale`` and
+            ``decode_cf`` arguments can't be set to different values,
+            but ``chunks`` may be redefined. The ``filename_or_obj``
+            argument can not be provided.
 
         zarr_options: `dict` or `None`, optional
             Keyword arguments that are passed to `zarr.open` when
@@ -2017,7 +2031,8 @@ class Dataset(Group):
             `None` (the default) is equivalent to providing an empty
             dictionary. The keyword argument ``mode='r'`` is always
             automatically applied, even when not provided, and can't
-            be set to a different value.
+            be set to a different value. The ``store`` argument can
+            not be provided.
 
         zarr_dimension_search: `str`, optional
             How to interpret a Zarr or Kerchunk dataset dimension name
@@ -2079,7 +2094,7 @@ class Dataset(Group):
         backend=None,
         structural_metadata_strategy="minimal",
         pyfive_options=None,
-        ppfive_options=None,
+        umfive_options=None,
         h5py_options=None,
         netCDF4_options=None,
         netcdf_file_options=None,
@@ -2099,8 +2114,8 @@ class Dataset(Group):
         if xarray_options:
             read_options["xarray"] = xarray_options
 
-        if ppfive_options:
-            read_options["ppfive"] = ppfive_options
+        if umfive_options:
+            read_options["umfive"] = umfive_options
 
         if netCDF4_options:
             read_options["netCDF4"] = netCDF4_options

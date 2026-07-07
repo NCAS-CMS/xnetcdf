@@ -7,7 +7,7 @@ The only dependexncy required run the software, besides Python, is
 `numpy` (version 2.0.0 or later).
 
 However, each of the :ref:`backend libraries <Backends>`\ `pyfive`,
-`netCDF4`, `zarr`, `scipy.io.netcdf_file`, `xarray`, `ppfive`, and
+`netCDF4`, `zarr`, `scipy.io.netcdf_file`, `xarray`, `umfive`, and
 `h5py` can only be used if it installed. It is not a problem, in
 general, if a backend library is not installed -- it just reduces the
 size of the pool of backends that are available for reading a dataset.
