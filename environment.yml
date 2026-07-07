@@ -13,7 +13,7 @@ dependencies:
   - h5py
   - scipy
   - pyfive
-  - ppfive
+  - umfive
   - zarr
   - xarray
   # testing and linting
