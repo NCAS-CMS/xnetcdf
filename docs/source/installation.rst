@@ -18,8 +18,7 @@ size of the pool of backends that are available for reading a dataset.
 
     $ pip install xnetcdf
 
-To install with all of the :ref:`backend libraries <Backends>` using
-``pip``:
+To install with all of the backend libraries using ``pip``:
 
 .. code-block:: console
 
