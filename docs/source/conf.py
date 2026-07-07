@@ -32,8 +32,8 @@ extensions = [
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
-    "netCDF4": ("https://unidata.github.io/netcdf4-python/", None),
-    "fsspec": ("https://filesystem-spec.readthedocs.io/", None),
+    # "netCDF4": ("https://unidata.github.io/netcdf4-python/", None),
+    # "fsspec": ("https://filesystem-spec.readthedocs.io/", None),
 }
 
 # Create a shortcut alias named 'netcdf'
