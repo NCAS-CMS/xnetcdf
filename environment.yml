@@ -13,7 +13,6 @@ dependencies:
   - h5py
   - scipy
   - pyfive
-  - umfive
   - zarr
   - xarray
   # testing and linting
@@ -26,3 +25,5 @@ dependencies:
   - autodocsumm
   - sphinx
   - sphinx_rtd_theme
+  - pip:
+    - umfive
