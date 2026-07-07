@@ -1,10 +1,10 @@
-"""Utilities for the `ppfive` backend."""
+"""Utilities for the `umfive` backend."""
 
 from .utils_general import get_dataset_name_and_protocol, get_library
 
 
-def ppfive_read(dataset, options):
-    """Read a dataset with `ppfive`.
+def umfive_read(dataset, options):
+    """Read a dataset with `umfive`.
 
     :Parameters:
 
@@ -20,21 +20,21 @@ def ppfive_read(dataset, options):
              interpreted.
 
         options: `dict`
-            Additional keyword parameters to pass to `ppfive.File`.
+            Additional keyword parameters to pass to `umfive.File`.
 
     :Returns:
 
-        (`ppfive.File`, `dict`, library)
+        (`umfive.File`, `dict`, library)
             The opened dataset, the dataset's global attributes, and
-            the `ppfive` library itself.
+            the `umfive` library itself.
 
     """
-    import ppfive
+    import umfive
 
     dataset_name = ""
     protocol = -1
 
-    if isinstance(dataset, ppfive.File):
+    if isinstance(dataset, umfive.File):
         nc = dataset
         library = get_library(dataset)
         dataset_name = dataset.filename
@@ -61,20 +61,20 @@ def ppfive_read(dataset, options):
                 pass
 
         if not dataset_name:
-            dataset_name = "<ppfive-like>"
+            dataset_name = "<umfive-like>"
 
     else:
         options = options.copy()
         mode = options.pop("mode", "r")
         if mode != "r":
-            raise ValueError(f"Can't set mode={mode!r} in ppfive_options")
+            raise ValueError(f"Can't set mode={mode!r} in umfive_options")
 
         dataset, dataset_name, protocol = get_dataset_name_and_protocol(
             dataset
         )
-        nc = ppfive.File(dataset, mode="r", **options)
+        nc = umfive.File(dataset, mode="r", **options)
 
-        library = ppfive
+        library = umfive
         owns_accessor = True
 
     return {
@@ -82,7 +82,7 @@ def ppfive_read(dataset, options):
         "protocol": protocol,
         "nc": nc,
         "attrs": nc.attrs,
-        "backend_api": "ppfive",
+        "backend_api": "umfive",
         "library": library,
         "owns_accessor": owns_accessor,
     }

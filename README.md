@@ -11,12 +11,14 @@
 
 ## [Read the documentation](https://xnetcdf.readthedocs.io)
 
+### Overview
+
 `xnetcdf` is a Python open source library for representing datasets,
 in a variety of formats and accessed through diverse Python backends,
 with a common netCDF view.
 
-A dataset format can be one of many formats that can be logically
-mapped to the [netCDF Enhanced Data
+A dataset format can be one of many formats <Dataset-formats that can
+be logically mapped to the [netCDF Enhanced Data
 Model](https://docs.unidata.ucar.edu/netcdf-c/current/netcdf_data_model.html).
 
 A dataset is mapped to an `xnetcdf.Dataset` object, which contains
@@ -33,14 +35,51 @@ rather external backend libraries are relied on to read the dataset
 which can then be mapped to the common netCDF view.
 
 `xnetcdf` supports the following backends for giving access to a
-dataset: `pyfive`, `zarr`, `ppfive`, `netCDF4`,
-`scipy.io.netcdf_file`, `h5py`, and `xarray`
+dataset:
+
+- `pyfive`
+- `zarr`
+- `umfive`
+- `netCDF4`
+- `scipy.io.netcdf_file`
+- `h5py`
+- `xarray`
+
+By default, `xnetcdf` will attempt to open a dataset with each of
+these backends in turn, in the order given above, returning the
+`xnetcdf.Dataset` object from the first successful read.
+
+.. note:: It is not a problem , in general, if a backend library is
+          not :ref:`installed <Installation>` -- it just restricts the
+          the pool of backends that are available for reading a
+          dataset.
 
 ### Dataset formats
 
 Supported dataset formats that can be read by at least one of the
-supported backends are: `netCDF-4`, `netCDF-3`, `Zarr v3`, `Zarr v2`,
-`Kerchunk`, `UK Met Office PP`, and `UK Met Office fields file`.
+supported backends (shown in brackets) are:
+
+- `netCDF-4
+  <https://docs.unidata.ucar.edu/nug/current/netcdf_introduction.html>`_
+  (`pyfive`, `zarr`, `netCDF4`, `h5py`, `xarray`)
+- `netCDF-3
+  <https://docs.unidata.ucar.edu/nug/current/netcdf_introduction.html>`_
+  (`netCDF4`, `scipy.io.netcdf_file`)
+- `Zarr v3
+  <https://zarr-specs.readthedocs.io/en/latest/specs.html>`_
+  (`zarr`, `xarray`)
+- `Zarr v2 <https://zarr-specs.readthedocs.io/en/latest/v2/v2.0.html>`_ 
+  (`zarr`, `netCDF4`, `xarray`)
+- `Kerchunk <https://fsspec.github.io/kerchunk>`_ (`zarr`, `xarray`)
+- `GRIB
+  <https://community.wmo.int/site/knowledge-hub/programmes-and-initiatives/wmo-information-system-wis/about-manual-codes-volume-i2>`_
+  (`xarray`)
+- `UK Met Office PP
+  <https://artefacts.ceda.ac.uk/badc_datadocs/um/umdp_F3-UMDPF3.pdf>`_
+  (`umfive`)
+- `UK Met Office fields file
+  <https://artefacts.ceda.ac.uk/badc_datadocs/um/umdp_F3-UMDPF3.pdf>`_
+  (`umfive`)
 
 ### Dataset definitions
 
@@ -57,15 +96,18 @@ dataset definitions:
   `fsspec.mapping.FSMap`)
 
 - Any of the following allowed backend objects that accesses the
-  dataset: `pyfive.File`, `zarr.Group`, `xarray.Dataset`,
-  `xarray.DataTree`, `ppfive.File`, `netCDF4.Dataset`,
-  `scipy.io.netcdf_file`, and `h5py.File`.
+  dataset: `pyfive.File`, `zarr.Group`, `umfive.File`,
+  `netCDF4.Dataset`, `scipy.io.netcdf_file`, `h5py.File`,
+  `xarray.Dataset`, and `xarray.DataTree`.
 
 - Any object ``x`` that accesses the dataset and has the same API as
   one of the allowed backend objects. In pratice, this means any
   object ``x`` for which ``isinstance(x, <backend-object>)`` is `True`
   for any ``<backend-object>`` from the selection of allowed backend
-  objects.
+  objects. For instance, if you have created a library called
+  ``my_pyfive`` for which ``my_pyfive.File`` is (registered as) a
+  subclass of `pyfive.File`, then ``my_pyfive.File`` instances can be
+  passed to `xnetcdf.Dataset`.
 
 ### A simple example
     
@@ -94,8 +136,8 @@ path/to/your/dataset: <xnetcdf.Dataset: /, 3 dimensions, 6 variables, 0 groups>
  'units': 'degrees_north'}
 >>> nc['lat'][...]  # Get a variable's data array
 array([-75., -45.,   0.,  45.,  75.])
-
 ```
+
 The dataset is presented in terms of netCDF groups, dimensions and
 variables (there is only the root group in this example), which can
 contain attributes and data arrays.
@@ -113,7 +155,7 @@ The only dependency required run the software, besides Python, is
 `numpy`.
 
 However, each of the backend libraries `pyfive`, `netCDF4`, `zarr`,
-`scipy.io.netcdf_file`, `xarray`, `ppfive`, and `h5py` can only be
+`scipy.io.netcdf_file`, `xarray`, `umfive`, and `h5py` can only be
 used if it also installed. It is not a problem, in general, if a
 backend library is not installed, as it just reduces the size of the
 pool of backends that are available for reading a dataset.

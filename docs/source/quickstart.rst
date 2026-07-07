@@ -4,9 +4,9 @@ Quick start
 ===========
 
 The examples on this page use the ``test.nc`` dataset (`download 28 KB
-<https://raw.githubusercontent.com/davidhassell/xnetcdf/main/tests/data/test.nc>`_). Example
+<https://raw.githubusercontent.com/NCAS-CMS/xnetcdf/main/tests/data/test.nc>`_). Example
 datasets in other formats can be found `here
-<https://github.com/davidhassell/xnetcdf/tree/main/tests/data>`_.
+<https://github.com/NCAS-CMS/xnetcdf/tree/main/tests/data>`_.
 
 ----
 

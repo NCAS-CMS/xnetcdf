@@ -371,11 +371,11 @@ def test_netcdf_file_2(data_dir):
     x.close()
 
 
-def test_ppfive_1(data_dir):
-    """Test ppfive functionality."""
+def test_umfive_1(data_dir):
+    """Test umfive functionality."""
     dataset = data_dir / "test2.pp"
-    with xnetcdf.Dataset(dataset, backend="ppfive") as p:
-        assert p.backend_api == "ppfive"
+    with xnetcdf.Dataset(dataset, backend="umfive") as p:
+        assert p.backend_api == "umfive"
         assert (
             p.dump(display=False)
             == f"""{p.dataset_name}: <xnetcdf.Dataset: /, 5 dimensions, 9 variables, 0 groups>
@@ -441,18 +441,18 @@ def test_ppfive_1(data_dir):
         )
 
 
-def test_ppfive_2(data_dir):
-    """Test ppfive functionality."""
-    import ppfive
+def test_umfive_2(data_dir):
+    """Test umfive functionality."""
+    import umfive
 
     dataset = data_dir / "test2.pp"
-    with ppfive.File(dataset) as x:
+    with umfive.File(dataset) as x:
         with (
-            xnetcdf.Dataset(dataset, backend="ppfive") as p1,
-            xnetcdf.Dataset(x, backend="ppfive") as p2,
+            xnetcdf.Dataset(dataset, backend="umfive") as p1,
+            xnetcdf.Dataset(x, backend="umfive") as p2,
         ):
-            assert p1.backend_api == "ppfive"
-            assert p2.backend_api == "ppfive"
+            assert p1.backend_api == "umfive"
+            assert p2.backend_api == "umfive"
             assert p1.dump(display=False, data=True) == p2.dump(
                 display=False, data=True
             )

@@ -18,7 +18,7 @@ from .utils import (
     netcdf_file_parse_group_structure,
     netcdf_file_read,
     parse_attributes,
-    ppfive_read,
+    umfive_read,
     pyfive_read,
     xarray_parse_group_structure,
     xarray_read,
@@ -36,7 +36,7 @@ from .utils import (
 _read_functions = {
     "pyfive": pyfive_read,
     "zarr": zarr_read,
-    "ppfive": ppfive_read,
+    "umfive": umfive_read,
     "netCDF4": netCDF4_read,
     "netcdf_file": netcdf_file_read,
     "h5py": h5py_read,
@@ -83,7 +83,7 @@ class Mixin:
 
             `str`
                 The name of the backend API, one of ``'pyfive'``,
-                ``'zarr'``, ``'ppfive'``, ``'netCDF4'``,
+                ``'zarr'``, ``'umfive'``, ``'netCDF4'``,
                 ``'netcdf_file'``, ``'h5py'``, and ``'xarray'``.
 
         """
@@ -637,7 +637,7 @@ class Variable(Mixin, Mixin2):
         chunks = getattr(self, "_chunks", None)
         if chunks is None:
             match self.backend_api:
-                case "pyfive" | "h5py" | "ppfive":
+                case "pyfive" | "h5py" | "umfive":
                     chunks = self._var.chunks
 
                 case "netCDF4":
@@ -720,7 +720,7 @@ class Variable(Mixin, Mixin2):
                     | "netCDF4"
                     | "h5py"
                     | "xarray"
-                    | "ppfive"
+                    | "umfive"
                 ):
                     dtype = self._var.dtype
 
@@ -905,7 +905,7 @@ class Variable(Mixin, Mixin2):
         if chunking is None:
             chunks = self.chunks
             match self.backend_api:
-                case "pyfive" | "zarr" | "xarray" | "h5py" | "ppfive":
+                case "pyfive" | "zarr" | "xarray" | "h5py" | "umfive":
                     if chunks is None:
                         chunking = "contiguous"
                     else:
@@ -1023,7 +1023,7 @@ class Variable(Mixin, Mixin2):
         dims = getattr(self, "_dims", None)
         if dims is None:
             match self.backend_api:
-                case "pyfive" | "h5py" | "ppfive":
+                case "pyfive" | "h5py" | "umfive":
                     dims = get_dimensions_from_defining_group(
                         self, hdf5_dimension_names(self)
                     )
@@ -1413,7 +1413,7 @@ class Group(Mixin, Mixin2, Mapping):
 
         """
         match self.backend_api:
-            case "pyfive" | "h5py" | "ppfive":
+            case "pyfive" | "h5py" | "umfive":
                 hdf5_parse_group_structure(self)
 
             case "netCDF4":
@@ -1815,7 +1815,7 @@ class Dataset(Group):
     
     Additionaly, a dataset may be provided as (a subclass of) any of
     the following backend objects: `pyfive.File`, `zarr.Group`,
-    `ppfive.File`, `netCDF4.Dataset`, `scipy.io.netcdf_file`,
+    `umfive.File`, `netCDF4.Dataset`, `scipy.io.netcdf_file`,
     `h5py.File`, `xarray.Dataset`, and `xarray.DataTree`. See the
     *dataset* parameter for details.
 
@@ -1874,7 +1874,7 @@ class Dataset(Group):
 
             * Any of the following backend objects (see the *backend*
               parameter) that defines a dataset: `pyfive.File`,
-              `zarr.Group`, `ppfive.File`, `netCDF4.Dataset`,
+              `zarr.Group`, `umfive.File`, `netCDF4.Dataset`,
               `scipy.io.netcdf_file`, `h5py.File`, `xarray.Dataset`,
               and `xarray.DataTree`.
 
@@ -1897,7 +1897,7 @@ class Dataset(Group):
             By default *backend* is `None`, which is equivalent to
             providing the ordered sequence of backends:
 
-            ``('pyfive', 'zarr' 'ppfive', 'netCDF4', 'netcdf_file',
+            ``('pyfive', 'zarr' 'umfive', 'netCDF4', 'netcdf_file',
             'h5py', 'xarray')``
 
             If the dataset is given as a (subclass of a) backend
@@ -1917,7 +1917,7 @@ class Dataset(Group):
             =================  ======================  ===================
             ``'pyfive'``       `pyfive`                netCDF-4
             ``'zarr'``         `zarr`                  Zarr, Kerchunk
-            ``'ppfive'``       `ppfive`                PP, fields file
+            ``'umfive'``       `umfive`                PP, fields file
             ``'netCDF4'``      `netCDF4`               netCDF-4, netCDF-3
             ``'netcdf_file'``  `scipy.io.netcdf_file`  netCDF-3
             ``'h5py'``         `h5py`                  netCDF-4
@@ -1970,9 +1970,9 @@ class Dataset(Group):
             can't be set to a different value. The ``filename``
             argument can not be provided.
 
-        ppfive_options: `dict` or `None`, optional
-            Keyword arguments that are passed to `ppfive.File` when
-            opening a dataset with the ``'ppfive'`` backend. Setting
+        umfive_options: `dict` or `None`, optional
+            Keyword arguments that are passed to `umfive.File` when
+            opening a dataset with the ``'umfive'`` backend. Setting
             to `None` (the default) is equivalent to providing an
             empty dictionary. The keyword argument ``mode='r'`` is
             always automatically applied, even when not provided, and
@@ -2094,7 +2094,7 @@ class Dataset(Group):
         backend=None,
         structural_metadata_strategy="minimal",
         pyfive_options=None,
-        ppfive_options=None,
+        umfive_options=None,
         h5py_options=None,
         netCDF4_options=None,
         netcdf_file_options=None,
@@ -2114,8 +2114,8 @@ class Dataset(Group):
         if xarray_options:
             read_options["xarray"] = xarray_options
 
-        if ppfive_options:
-            read_options["ppfive"] = ppfive_options
+        if umfive_options:
+            read_options["umfive"] = umfive_options
 
         if netCDF4_options:
             read_options["netCDF4"] = netCDF4_options
