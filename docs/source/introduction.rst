@@ -19,8 +19,6 @@ objects), and attributes. A variable is associated with dimensions and
 may contain attributes; and a group may contain sub-groups,
 dimensions, variables, and attributes.
 
-.. _Backends:
-
 Backends
 ^^^^^^^^
 
@@ -47,8 +45,6 @@ these backends in turn, in the order given above, returning the
           not :ref:`installed <Installation>` -- it just restricts the
           the pool of backends that are available for reading a
           dataset.
-
-.. _Dataset-formats:
 
 Dataset formats
 ^^^^^^^^^^^^^^^
