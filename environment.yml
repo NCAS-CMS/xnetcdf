@@ -24,6 +24,6 @@ dependencies:
   # documentation dependencies
   - autodocsumm
   - sphinx
-  - sphinx_rtd_theme
+  - furo
   - pip:
     - umfive
