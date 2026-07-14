@@ -37,6 +37,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
+    "h5netcdf",
     "pre-commit",
     "pytest",
     "pytest-cov",
