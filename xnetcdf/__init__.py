@@ -1,8 +1,9 @@
 from .xnetcdf import Dataset, Group, Variable, Dimension, backends
+from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError
+
 
 __date__ = "2026-07-01"
-
-from importlib.metadata import PackageNotFoundError
 
 try:
     __version__ = version("xnetcdf")
