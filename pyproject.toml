@@ -25,6 +25,8 @@ classifiers = [
 dependencies = [
     "numpy>=2.0.0",
     "netCDF4!=1.7.4",
+    "dask",
+    "fsspec",
     "h5py",
     "scipy",
     "pyfive>=1.1.1",
