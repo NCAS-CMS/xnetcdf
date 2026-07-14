@@ -52,7 +52,7 @@ Code = "https://github.com/NCAS-CMS/xnetcdf"
 Issues = "https://github.com/NCAS-CMS/xnetcdf/issues"
 
 [tool.setuptools]
-packages = ["src/xnetcdf"]
+packages = ["xnetcdf"]
 
 [tool.setuptools.dynamic]
 readme = {file = "README.md", content-type = "text/markdown"}
@@ -69,7 +69,7 @@ addopts = [
 
 # [tool.coverage.run]
 # parallel = true
-# source = ["src/xnetcdf"]
+# source = ["xnetcdf"]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -104,7 +104,7 @@ allow-star-arg-any = true
 ignore-fully-untyped = true
 # turn these on at a later stage
 # [tool.ruff.lint.isort]
-# known-first-party = ["src/xnetcdf"]
+# known-first-party = ["xnetcdf"]
 # [tool.ruff.lint.pydocstyle]
 # convention = "numpy"
 # [tool.ruff.lint.pylint]
