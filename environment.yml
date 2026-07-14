@@ -7,7 +7,7 @@ channels:
 dependencies:
   # core dependencies
   - numpy >=2
-  - python >=3.10
+  - python >=3.11  # pinned Zarr, pyfive and umfive
   # all backends
   - dask
   - fsspec
