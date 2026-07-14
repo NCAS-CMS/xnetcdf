@@ -1,4 +1,16 @@
 from .xnetcdf import Dataset, Group, Variable, Dimension, backends
 
 __date__ = "2026-07-01"
-__version__ = "0.1.0"
+
+from importlib.metadata import PackageNotFoundError
+
+try:
+    __version__ = version("xnetcdf")
+except PackageNotFoundError as exc:
+    msg = (
+        "xnetcdf package not found, please run `pip install -e .` before "
+        "importing the package."
+    )
+    raise PackageNotFoundError(
+        msg,
+    ) from exc
