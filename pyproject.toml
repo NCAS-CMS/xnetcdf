@@ -1,5 +1,8 @@
 [build-system]
-requires = ["setuptools>=61.0.0", "wheel"]
+requires = [
+    "setuptools>=80",
+    "setuptools_scm>=8",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -19,61 +22,96 @@ classifiers = [
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
 ]
-
-# Core, mandatory dependencies required for the package to import
 dependencies = [
     "numpy>=2.0.0",
-]
-
-# Optional dependencies (Extras) 
-# Users can install these via: pip install .[all] or pip install .[backends]
-[project.optional-dependencies]
-backends = [
-    "netCDF4",
+    "netCDF4!=1.7.4",
     "h5py",
     "scipy",
-    "pyfive",
-    "umfive",
-    "zarr",
+    "pyfive>=1.1.1",
+    "umfive>=0.2.2",
+    "zarr>=3.1.3",
     "xarray",
 ]
-# A catch-all shortcut to install every optional feature at once
-all = [
-    "netCDF4",
-    "h5py",
-    "scipy",
-    "pyfive",
-    "umfive",
-    "zarr",
-    "xarray",
-]
-dev = [
+test = [
+    "pre-commit",
     "pytest",
-    "black",
-    "isort",
-    "pydocstyle",
+    "pytest-cov",
+    "pytest-html",
+    "pytest-xdist",
 ]
 
 docs = [
+    "autodocsumm",
     "sphinx",
-    "sphinx_rtd_theme",
+    "furo",
 ]
 
-[tool.black]
-line-length = 79
+[project.urls]
+Code = "https://github.com/NCAS-CMS/xnetcdf"
+Issues = "https://github.com/NCAS-CMS/xnetcdf/issues"
 
-# Set for compatibility of 'black' and 'isort' auto-formatting tools
-[tool.isort]
-profile = "black"
-# ... and since we set this against the black default line length:
-line_length=79
-# Prevent isort from auto-formatting '__init__.py' file imports because
-# they require a specific non-aphabetical (etc.) ordering else they will
-# cause errors due to bad or circular importing across the modules.
-extend_skip_glob = [
-  "**/__init__.py",
+[tool.setuptools]
+packages = ["xnetcdf"]
+
+[tool.setuptools.dynamic]
+readme = {file = "README.md", content-type = "text/markdown"}
+
+[tool.setuptools_scm]
+version_scheme = "release-branch-semver"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--cov-report=xml:test-reports/coverage.xml",
+    "--cov-report=html:test-reports/coverage_html",
+    "--html=test-reports/report.html",
 ]
 
-# Prevent message about missing docstring in magic method
-[tool.pydocstyle]
-ignore = "D105"
+# [tool.coverage.run]
+# parallel = true
+# source = ["xnetcdf"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # Pyflakes
+]
+ignore = [
+    # these should not be fixed
+    "F401",      # unused imports: some are really needed
+    "F841",      # unused variables: some are really needed
+    # we may want to fix these
+    "E721",      # type comparison issues (2 errors)
+    "F811",      # redefined while unused (1 error)
+    "E722",      # bare except (1 error)
+    "E711",      # None comparison (1 error)
+]
+future-annotations = true
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 150
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true
+ignore-fully-untyped = true
+# turn these on at a later stage
+# [tool.ruff.lint.isort]
+# known-first-party = ["xnetcdf"]
+# [tool.ruff.lint.pydocstyle]
+# convention = "numpy"
+# [tool.ruff.lint.pylint]
+# max-args = 7
+
+[tool.mypy]
+# See https://mypy.readthedocs.io/en/stable/config_file.html
+ignore_missing_imports = true
+enable_error_code = [
+    "truthy-bool",
+]

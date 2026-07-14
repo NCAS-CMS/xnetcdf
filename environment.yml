@@ -9,11 +9,12 @@ dependencies:
   - numpy >=2
   - python >=3.10
   # all backends
-  - netCDF4
+  - netCDF4 !=1.7.4  # github.com/Unidata/netcdf4-python/issues/1464
   - h5py
   - scipy
-  - pyfive
-  - zarr
+  - pyfive >=1.1.1
+  - umfive >=0.2.2
+  - zarr >=3.1.3
   - xarray
   # testing and linting
   - pre-commit  # with ruff and mypy
@@ -25,5 +26,3 @@ dependencies:
   - autodocsumm
   - sphinx
   - furo
-  - pip:
-    - umfive
