@@ -1,0 +1,61 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Xnetcdf Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * *'  # nightly
+
+# Required shell entrypoint to have properly configured bash shell
+defaults:
+  run:
+    shell: bash -l {0}
+
+jobs:
+  build:
+
+    name: Test Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v7.0.0
+        with:
+          fetch-depth: 0
+      - uses: conda-incubator/setup-miniconda@v4.0.1
+        with:
+          activate-environment: xnetcdf
+          environment-file: environment.yml
+          python-version: ${{ matrix.python-version }}
+          miniforge-version: "latest"
+          use-mamba: true
+      - name: Install Xnetcdf Test Mode
+        run: |
+          mamba install -c conda-forge pip
+          pip install -e .[test]
+      - name: Run pip check
+        run: pip check
+      # Pre-commit fails so we need to fix issues with it @davidhassell
+      # - name: Run pre-commit with mypy
+      #   run: |
+      #     pre-commit install
+      #     pre-commit run -a
+      - name: Check environment contents
+        run: |
+          conda list
+          pip list
+      - name: Test with pytest
+        run: |
+          pytest -n 2
+      # Pop coverage at a later stage
+      # - uses: codecov/codecov-action@v7.0.0
