@@ -1,4 +1,4 @@
-Copyright (c) 2016 Jonathan J. Helmus
+Copyright (c) 2026 NCAS CMS
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
