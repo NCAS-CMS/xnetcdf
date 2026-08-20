@@ -487,8 +487,7 @@ Variable attributes
 ^^^^^^^^^^^^^^^^^^^
 
 The attributes of an `xnetcdf.Variable` instance are accessed with the
-`~xnetcdf.Variable.attrs` attribute.  following whatever indexing
-rules are allowed by the underlying backend object.
+`~xnetcdf.Variable.attrs` attribute.
 
 .. code-block:: python
    :caption: Example
