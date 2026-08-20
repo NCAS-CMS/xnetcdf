@@ -380,7 +380,7 @@ def test_umfive_1(data_dir):
             p.dump(display=False)
             == f"""{p.dataset_name}: <xnetcdf.Dataset: /, 5 dimensions, 9 variables, 0 groups>
     Attributes:
-        Conventions: 'CF-1.14'
+        Conventions: 'CF-1.13'
     Dimensions:
         height: <xnetcdf.Dimension: /height, size=1>
         time: <xnetcdf.Dimension: /time, size=100>
@@ -437,7 +437,9 @@ def test_umfive_1(data_dir):
                 standard_name: 'latitude'
                 units: 'degrees_north'
         latitude_bounds: <xnetcdf.Variable: /latitude_bounds, shape=(3, 2), dimensions=(/site, /bounds2)>
-        region: <xnetcdf.Variable: /region, shape=(3,), dimensions=(/site,)>"""
+        region: <xnetcdf.Variable: /region, shape=(3,), dimensions=(/site,)>
+            Attributes:
+                standard_name: 'region'"""
         )
 
 
