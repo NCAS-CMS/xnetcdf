@@ -41,7 +41,7 @@ By default, `xnetcdf` will attempt to open a dataset with each of
 these backends in turn, in the order given above, returning the
 `xnetcdf.Dataset` object from the first successful read.
 
-.. note:: It is not a problem , in general, if a backend library is
+.. note:: It is not a problem, in general, if a backend library is
           not :ref:`installed <Installation>` -- it just restricts the
           the pool of backends that are available for reading a
           dataset.
