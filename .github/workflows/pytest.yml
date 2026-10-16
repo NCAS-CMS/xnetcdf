@@ -57,5 +57,7 @@ jobs:
       - name: Test with pytest
         run: |
           pytest -n 2
+      - name: run umdump3
+        run: umdump tests/data/test2.pp
       # Pop coverage at a later stage
       # - uses: codecov/codecov-action@v7.0.0
