@@ -393,7 +393,6 @@ def test_umfive_1(data_dir):
                 cell_methods: 'realization: mean time: mean'
                 coordinates: 'height time site longitude latitude region'
                 lbcode: '11323'
-                lbpack: '0'
                 lbproc: '131200'
                 lbtim: '22'
                 lbvc: '1'
