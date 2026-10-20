@@ -17,8 +17,8 @@
 in a variety of formats and accessed through diverse Python backends,
 with a common netCDF view.
 
-A dataset format can be one of many formats <Dataset-formats that can
-be logically mapped to the [netCDF Enhanced Data
+A dataset format can be one of many formats that can be logically
+mapped to the [netCDF Enhanced Data
 Model](https://docs.unidata.ucar.edu/netcdf-c/current/netcdf_data_model.html).
 
 A dataset is mapped to an `xnetcdf.Dataset` object, which contains
