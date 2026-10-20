@@ -373,27 +373,27 @@ def test_netcdf_file_2(data_dir):
 
 def test_umfive_1(data_dir):
     """Test umfive functionality."""
-    dataset = data_dir / "test2.pp"
+    dataset = data_dir / "extra_data.pp"
     with xnetcdf.Dataset(dataset, backend="umfive") as p:
         assert p.backend_api == "umfive"
         assert (
             p.dump(display=False)
-            == f"""{p.dataset_name}: <xnetcdf.Dataset: /, 5 dimensions, 9 variables, 0 groups>
+            == f"""{p.dataset_name}: <xnetcdf.Dataset: /, 4 dimensions, 9 variables, 0 groups>
     Attributes:
-        Conventions: 'CF-1.14'
+        Conventions: 'CF-1.13'
     Dimensions:
-        height: <xnetcdf.Dimension: /height, size=1>
         time: <xnetcdf.Dimension: /time, size=100>
         site: <xnetcdf.Dimension: /site, size=3>
         bounds2: <xnetcdf.Dimension: /bounds2, size=2>
         dimension1: <xnetcdf.Dimension: /dimension1, size=1>
     Variables:
-        UM_m01s03i236_vn405: <xnetcdf.Variable: /UM_m01s03i236_vn405, shape=(1, 1, 100, 3), dimensions=(/dimension1, /height, /time, /site)>
+        UM_m01s03i236_vn405: <xnetcdf.Variable: /UM_m01s03i236_vn405, shape=(1, 100, 3), dimensions=(/dimension1, /time, /site)>
             Attributes:
                 _FillValue: np.float32(-1.0737418e+09)
                 cell_methods: 'realization: mean time: mean'
                 coordinates: 'height time site longitude latitude region'
                 lbcode: '11323'
+                lbpack: '0'
                 lbproc: '131200'
                 lbtim: '22'
                 lbvc: '1'
@@ -408,10 +408,8 @@ def test_umfive_1(data_dir):
                 um_stash_source: 'm01s03i236'
                 um_version: '4.5'
                 units: 'K'
-        height: <xnetcdf.Variable: /height, shape=(1,), dimensions=(/height,)>
+        height: <xnetcdf.Variable: /height, shape=(), dimensions=()>
             Attributes:
-                axis: 'Z'
-                positive: 'up'
                 standard_name: 'height'
                 units: 'm'
         time: <xnetcdf.Variable: /time, shape=(100,), dimensions=(/time,)>
@@ -437,7 +435,9 @@ def test_umfive_1(data_dir):
                 standard_name: 'latitude'
                 units: 'degrees_north'
         latitude_bounds: <xnetcdf.Variable: /latitude_bounds, shape=(3, 2), dimensions=(/site, /bounds2)>
-        region: <xnetcdf.Variable: /region, shape=(3,), dimensions=(/site,)>"""
+        region: <xnetcdf.Variable: /region, shape=(3,), dimensions=(/site,)>
+            Attributes:
+                standard_name: 'region'"""
         )
 
 
@@ -445,7 +445,7 @@ def test_umfive_2(data_dir):
     """Test umfive functionality."""
     import umfive
 
-    dataset = data_dir / "test2.pp"
+    dataset = data_dir / "extra_data.pp"
     with umfive.File(dataset) as x:
         with (
             xnetcdf.Dataset(dataset, backend="umfive") as p1,
