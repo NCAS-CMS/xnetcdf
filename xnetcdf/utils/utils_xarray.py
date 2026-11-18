@@ -50,8 +50,8 @@ def xarray_parse_group_structure(group):
 def xarray_read(dataset, options):
     """Read a dataset with `xarray`.
 
-    The dataset is opened with `xarray.open_datatree` options
-    ``mask_and_scale=False`` and ``decode_cf=False``.
+    The dataset is opened with `xarray.open_datatree` option
+    ``decode_cf=False``.
 
     :Parameters:
 
@@ -68,10 +68,10 @@ def xarray_read(dataset, options):
 
         options: `dict`
             Additional keyword parameters to pass to
-            `xarray.open_datatree`. The keyword arguments
-            ``mask_and_scale=False, decode_cf=False`` are always
-            automatially applied, even when not provided in *options*,
-            and can't be set to different values.
+            `xarray.open_datatree`. The keyword argument
+            ``decode_cf=False`` is always automatially applied, even
+            when not provided in *options*, and can't be set to
+            different values.
 
     :Returns:
 
@@ -122,7 +122,7 @@ def xarray_read(dataset, options):
         library = xarray
         owns_accessor = True
 
-        # No need to reverse any xarray-specific CF encoding because
+        # No need to reverse any xarray CF encoding because
         # decode_cf=False
         undecode_cf = False
 

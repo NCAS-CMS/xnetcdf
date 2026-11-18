@@ -2018,10 +2018,9 @@ class Dataset(Group):
             `xarray.open_datatree` when opening a dataset with the
             ``'xarray'`` backend. Setting to `None` (the default) is
             equivalent to providing an empty dictionary. The keyword
-            arguments ``mask_and_scale=False``, ``decode_cf=False``,
-            and ``chunks='auto'`` are always automatically applied,
-            even when not provided. The ``mask_and_scale`` and
-            ``decode_cf`` arguments can't be set to different values,
+            arguments ``decode_cf=False`` and ``chunks='auto'`` are
+            always automatically applied, even when not provided. The
+            ``decode_cf`` arguments can't be set to a different value,
             but ``chunks`` may be redefined. The ``filename_or_obj``
             argument can not be provided.
 
