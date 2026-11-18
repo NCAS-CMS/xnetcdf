@@ -85,6 +85,8 @@ def xarray_read(dataset, options):
     dataset_name = None
     protocol = -1
 
+    undecode_cf = True
+
     if isinstance(dataset, (xarray.Dataset, xarray.DataTree)):
         if isinstance(dataset, xarray.Dataset):
             # Convert a Dataset to a DataTree
@@ -105,11 +107,7 @@ def xarray_read(dataset, options):
 
     else:
         options = options.copy()
-        mask_and_scale = options.pop("mask_and_scale", False)
         decode_cf = options.pop("decode_cf", False)
-        if mask_and_scale:
-            raise ValueError("Can't set mask_and_scale=True in xarray_options")
-
         if decode_cf:
             raise ValueError("Can't set decode_cf=True in xarray_options")
 
@@ -119,12 +117,18 @@ def xarray_read(dataset, options):
         dataset, dataset_name, protocol = get_dataset_name_and_protocol(
             dataset
         )
-        nc = xarray.open_datatree(
-            dataset, mask_and_scale=False, decode_cf=False, **options
-        )
+        nc = xarray.open_datatree(dataset, decode_cf=False, **options)
 
         library = xarray
         owns_accessor = True
+
+        # No need to reverse any xarray-specific CF encoding because
+        # decode_cf=False
+        undecode_cf = False
+
+    if undecode_cf:
+        # Reverse any xarray-specific CF decoding
+        nc = xarray_undecode_cf(nc)
 
     return {
         "dataset_name": dataset_name,
@@ -135,3 +139,120 @@ def xarray_read(dataset, options):
         "library": library,
         "owns_accessor": owns_accessor,
     }
+
+
+def _undecode_cf_dataset(ds, own_keys=None):
+    """Reverse xarray.decode_cf on a single `xarray.Dataset`.
+
+    .. versionadded:: 0.3.0
+
+    :Parameters:
+
+        ds: `xarray.Dataset`
+            The dataset to undecode.
+
+        own_keys: `set` or `None`, optional
+            The names of the variables and coordinates directly owned
+            by the dataset or `DataTree` node (excluding any inherited
+            from ancestor groups). When provided, inherited
+            coordinates remain visible during CF ``coordinates``
+            attribute reconstruction, after which only variables in
+            *own_keys* are retained in the returned `Dataset`. If
+            `None` (the default), all variables in *ds* are retained.
+
+    :Returns:
+
+        `xarray.Dataset`
+            The undecoded dataset.
+
+    """
+    import xarray
+
+    attrs = dict(ds.attrs)
+    coordinates = ds.encoding.get("coordinates")
+    if coordinates is not None:
+        attrs.setdefault("coordinates", coordinates)
+
+    # Shallow-copy variables and their encodings directly (avoiding
+    # Dataset.__init__, which strips 'encoding' from IndexVariables)
+    variables = {}
+    for k, v in ds.variables.items():
+        var = v.copy(deep=False)
+        var.attrs = dict(var.attrs)
+        var.encoding = dict(var.encoding)
+
+        # Restore the coordinates attribute only if it actually
+        # existed in 'encoding'
+        if "coordinates" in var.encoding:
+            coords_attr = var.encoding.pop("coordinates")
+            if coords_attr is not None:
+                var.attrs.setdefault("coordinates", coords_attr)
+
+        # Prevent CFMaskCoder from inventing `_FillValue: nan` on
+        # float variables that did not originally have a `_FillValue`
+        # on disk
+        if "_FillValue" not in var.attrs:
+            var.encoding.setdefault("_FillValue", None)
+
+        variables[k] = var
+
+    # Reverse CF variable decoding (times, scale/offset, _FillValue,
+    # char arrays)
+    variables, attrs = xarray.conventions.cf_encoder(variables, attrs)
+
+    # Reverse CF variable decoding (times, scale/offset, _FillValue,
+    # char arrays)
+    variables, attrs = xarray.conventions.cf_encoder(variables, attrs)
+
+    if own_keys is not None:
+        # For DataTree nodes, drop variables/coords inherited from
+        # ancestor groups
+        variables = {k: v for k, v in variables.items() if k in own_keys}
+
+    # Only 1-d dimension-matching variables live in "coords"
+    dim_coords = {k: v for k, v in variables.items() if v.dims == (k,)}
+    data_vars = {k: v for k, v in variables.items() if v.dims != (k,)}
+
+    # Create the undecoded dataset
+    out = xarray.Dataset(data_vars=data_vars, coords=dim_coords, attrs=attrs)
+
+    # Preserve datase and group encodings (including 'unlimited_dims')
+    out.encoding = {
+        key: set(v) if isinstance(v, set) else v
+        for key, v in ds.encoding.items()
+        if key != "coordinates"
+    }
+    return out
+
+
+def xarray_undecode_cf(ds):
+    """Reverse any effects of `xarray.decode_cf`.
+
+    .. versionadded:: 0.3.0
+
+    :Parameters:
+
+        ds: `xarray.Dataset` or `xarray.DataTree`
+            The dataset to undecode.
+
+    :Returns:
+
+        `xarray.Dataset` or `xarray.DataTree`
+            The undecoded dataset.
+
+    """
+    import xarray
+
+    if isinstance(ds, xarray.Dataset):
+        return _undecode_cf_dataset(ds)
+
+    if isinstance(ds, xarray.DataTree):
+        nodes = {
+            node.path: _undecode_cf_dataset(node.to_dataset(inherit=False))
+            for node in ds.subtree
+        }
+        return xarray.DataTree.from_dict(nodes, name=ds.name)
+
+    raise TypeError(
+        f"Expected xarray.Dataset or xarray.DataTree. Got: {type(ds)!r}"
+    )

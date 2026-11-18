@@ -18,8 +18,8 @@ from .utils import (
     netcdf_file_parse_group_structure,
     netcdf_file_read,
     parse_attributes,
-    umfive_read,
     pyfive_read,
+    umfive_read,
     xarray_parse_group_structure,
     xarray_read,
     zarr_parse_group_structure,
@@ -44,8 +44,8 @@ _read_functions = {
 }
 
 backends = tuple(_read_functions)
-"""Supported backends available for accessing datasets, in the order
-in which access is attempted."""
+"""Supported backends available for accessing datasets, in the order in
+which access is attempted."""
 
 # np.printoptions parameters for `dump` method output (17 significant
 # digits is enough to fully represent every possible bit of precision
@@ -1812,7 +1812,7 @@ class Dataset(Group):
     Supported dataset formats that can be read by at least one of the
     supported backends are: netCDF-4, netCDF-3, Zarr v3, Zarr v2,
     Kerchunk, UK Met Office PP, and UK Met Office fields file.
-    
+
     Additionaly, a dataset may be provided as (a subclass of) any of
     the following backend objects: `pyfive.File`, `zarr.Group`,
     `umfive.File`, `netCDF4.Dataset`, `scipy.io.netcdf_file`,
