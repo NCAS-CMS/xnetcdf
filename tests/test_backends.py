@@ -1,4 +1,11 @@
+from pathlib import Path
+
+import numpy as np
+import pytest
+import xarray as xr
+
 import xnetcdf
+from xnetcdf.utils import xarray_undecode_cf
 
 
 def test_netCDF4_1(data_dir):
@@ -685,3 +692,163 @@ def test_pyfive_2(data_dir):
             assert p1.dump(display=False, data=True) == p2.dump(
                 display=False, data=True
             )
+
+
+def _assert_datasets_match_raw(actual: xr.Dataset, expected: xr.Dataset):
+    """Assert unencoded Datasets match."""
+    assert set(actual.data_vars) == set(expected.data_vars)
+    assert set(actual.coords) == set(expected.coords)
+    assert actual.attrs == expected.attrs
+    assert actual.encoding.get("unlimited_dims", set()) == (
+        expected.encoding.get("unlimited_dims", set())
+    )
+
+    for name in expected.variables:
+        act_var = actual[name]
+        exp_var = expected[name]
+
+        assert act_var.dims == exp_var.dims
+        assert act_var.dtype == exp_var.dtype
+        np.testing.assert_equal(act_var.values, exp_var.values)
+
+        act_attrs = dict(act_var.attrs)
+        exp_attrs = dict(exp_var.attrs)
+        # Xarray infers 'proleptic_gregorian' on decode when 'calendar' is
+        # omitted on disk, so cf_encoder writes it back on re-encode.
+        if (
+            "calendar" not in exp_attrs
+            and act_attrs.get("calendar") == "proleptic_gregorian"
+        ):
+            act_attrs.pop("calendar")
+
+        assert act_attrs.keys() == exp_attrs.keys()
+        for attr, exp_val in exp_attrs.items():
+            np.testing.assert_equal(act_attrs[attr], exp_val)
+
+
+@pytest.mark.parametrize("group", [None, "/forecast", "/forecast/model"])
+def test_xarray_undecode_cf_dataset_groups(data_dir, group):
+    """Check group.
+
+    xarray_undecode_cf(decode_cf=True) matches
+    open_dataset(decode_cf=False).
+
+    """
+    test_nc_path = data_dir / "test.nc"
+    raw = xr.open_dataset(test_nc_path, group=group, decode_cf=False)
+    decoded = xr.open_dataset(test_nc_path, group=group, decode_cf=True)
+
+    # Snapshot input to verify xarray_undecode_cf does not mutate it
+    orig_vars = set(decoded.variables)
+    orig_coords = set(decoded.coords)
+
+    reverted = xarray_undecode_cf(decoded)
+
+    assert set(decoded.variables) == orig_vars
+    assert set(decoded.coords) == orig_coords
+    _assert_datasets_match_raw(reverted, raw)
+
+    # Idempotency: unencoding an already-raw Dataset is a no-op
+    _assert_datasets_match_raw(xarray_undecode_cf(raw), raw)
+
+
+def test_xarray_undecode_cf_datatree(data_dir):
+    """Check DataTree.
+
+    xarray_undecode_cf on a DataTree reproduces
+    open_datatree(decode_cf=False).
+
+    """
+    test_nc_path = data_dir / "test.nc"
+    raw_dt = xr.open_datatree(test_nc_path, decode_cf=False)
+    decoded_dt = xr.open_datatree(test_nc_path, decode_cf=True)
+
+    reverted_dt = xarray_undecode_cf(decoded_dt)
+
+    assert [n.path for n in reverted_dt.subtree] == [
+        n.path for n in raw_dt.subtree
+    ]
+
+    for raw_node, rev_node in zip(raw_dt.subtree, reverted_dt.subtree):
+        raw_ds = raw_node.to_dataset(inherit=False)
+        rev_ds = rev_node.to_dataset(inherit=False)
+        _assert_datasets_match_raw(rev_ds, raw_ds)
+
+    # Spot-check key features from the test file
+    root = reverted_dt["/"].to_dataset(inherit=False)
+    assert "time" in root.data_vars
+    assert "time" not in root.coords
+    assert root["time"].attrs["units"] == "days since 2018-12-01"
+    assert "_FillValue" not in root["time"].attrs
+
+    model = reverted_dt["/forecast/model"].to_dataset(inherit=False)
+    assert model.attrs["group_attr_2"] == "bar"
+    assert model["q"].attrs["standard_name"] == "specific_humidity"
+    assert model["q"].attrs["coordinates"] == "time"
+    assert "coordinates" not in model["lat_bnds"].attrs
+    assert "_FillValue" not in model["lat_bnds"].attrs
+
+
+def test_unencode_cf_packing_masking_and_bounds(tmp_path: Path):
+    """Check _FillValue, scale/offset, unlimited_dims, and bounds."""
+    nc_path = tmp_path / "cf_features.nc"
+
+    # Build a raw CF dataset directly so disk metadata is exact
+    ds_disk = xr.Dataset(
+        data_vars={
+            "time": xr.Variable(
+                ("time",),
+                np.array([0.0, 1.0], dtype="float64"),
+                attrs={
+                    "units": "days since 2020-01-01",
+                    "calendar": "standard",
+                },
+            ),
+            "lon_bnds": xr.Variable(
+                ("lon", "bnds"),
+                np.array([[0.0, 10.0], [10.0, 20.0]], dtype="float64"),
+                attrs={"units": "degrees_east"},
+            ),
+            "tas": xr.Variable(
+                ("time", "lon"),
+                np.array([[100, -999], [200, 300]], dtype="int16"),
+                attrs={
+                    "units": "K",
+                    "scale_factor": np.float32(0.1),
+                    "add_offset": np.float32(250.0),
+                    "_FillValue": np.int16(-999),
+                    "coordinates": "time",
+                },
+            ),
+        },
+        coords={
+            "lon": xr.Variable(
+                ("lon",),
+                np.array([5.0, 15.0], dtype="float64"),
+                attrs={"units": "degrees_east", "bounds": "lon_bnds"},
+            ),
+        },
+    )
+
+    ds_disk.encoding["unlimited_dims"] = {"time"}
+    ds_disk.to_netcdf(nc_path, mode="w", format="NETCDF4")
+
+    # Re-add lon_bnds:units on disk since to_netcdf() strips matching
+    # bounds attributes during serialization
+    import netCDF4
+
+    with netCDF4.Dataset(nc_path, mode="a") as nc:
+        nc.variables["lon_bnds"].units = "degrees_east"
+
+    raw = xr.open_dataset(nc_path, decode_cf=False)
+    decoded = xr.open_dataset(nc_path, decode_cf=True)
+    reverted = xarray_undecode_cf(decoded)
+
+    _assert_datasets_match_raw(reverted, raw)
+    assert reverted["lon_bnds"].attrs["units"] == "degrees_east"
+
+
+def test_unencode_cf_invalid_type():
+    """Raise TypeError for unsupported input types."""
+    with pytest.raises(TypeError, match="Dataset or xarray.DataTree"):
+        xarray_undecode_cf({"not": "a dataset"})  # type: ignore[arg-type]

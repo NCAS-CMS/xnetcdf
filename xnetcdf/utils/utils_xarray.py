@@ -188,21 +188,29 @@ def _undecode_cf_dataset(ds, own_keys=None):
             if coords_attr is not None:
                 var.attrs.setdefault("coordinates", coords_attr)
 
-        # Prevent CFMaskCoder from inventing `_FillValue: nan` on
-        # float variables that did not originally have a `_FillValue`
-        # on disk
+        # Prevent CFMaskCoder from inventing _FillValue=nan on float
+        # variables that did not originally have a _FillValue on disk
         if "_FillValue" not in var.attrs:
             var.encoding.setdefault("_FillValue", None)
 
         variables[k] = var
 
-    # Reverse CF variable decoding (times, scale/offset, _FillValue,
-    # char arrays)
-    variables, attrs = xarray.conventions.cf_encoder(variables, attrs)
+    orig_attrs = {key: dict(v.attrs) for key, v in ds.variables.items()}
 
     # Reverse CF variable decoding (times, scale/offset, _FillValue,
     # char arrays)
     variables, attrs = xarray.conventions.cf_encoder(variables, attrs)
+
+    # Restore explicitly supplied bounds attributes that cf_encoder
+    # strips during serialization cleanup (e.g. matching 'units' on
+    # bounds variables)
+    for var in variables.values():
+        bounds = var.attrs.get("bounds")
+        if isinstance(bounds, str):
+            bnds_name = bounds.rsplit("/", 1)[-1]
+            if bnds_name in variables:
+                for attr, val in orig_attrs.get(bnds_name, {}).items():
+                    variables[bnds_name].attrs.setdefault(attr, val)
 
     if own_keys is not None:
         # For DataTree nodes, drop variables/coords inherited from

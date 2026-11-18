@@ -16,5 +16,9 @@ from .utils_netcdf_file import (
 )
 from .utils_pyfive import pyfive_read
 from .utils_umfive import umfive_read
-from .utils_xarray import xarray_parse_group_structure, xarray_read
+from .utils_xarray import (
+    xarray_parse_group_structure,
+    xarray_read,
+    xarray_undecode_cf,
+)
 from .utils_zarr import zarr_parse_group_structure, zarr_read
