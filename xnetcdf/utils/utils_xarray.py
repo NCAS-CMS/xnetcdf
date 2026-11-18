@@ -141,7 +141,7 @@ def xarray_read(dataset, options):
     }
 
 
-def _undecode_cf_dataset(ds, own_keys=None):
+def _undecode_cf_dataset(ds):
     """Reverse xarray.decode_cf on a single `xarray.Dataset`.
 
     .. versionadded:: 0.3.0
@@ -150,15 +150,6 @@ def _undecode_cf_dataset(ds, own_keys=None):
 
         ds: `xarray.Dataset`
             The dataset to undecode.
-
-        own_keys: `set` or `None`, optional
-            The names of the variables and coordinates directly owned
-            by the dataset or `DataTree` node (excluding any inherited
-            from ancestor groups). When provided, inherited
-            coordinates remain visible during CF ``coordinates``
-            attribute reconstruction, after which only variables in
-            *own_keys* are retained in the returned `Dataset`. If
-            `None` (the default), all variables in *ds* are retained.
 
     :Returns:
 
@@ -212,14 +203,9 @@ def _undecode_cf_dataset(ds, own_keys=None):
                 for attr, val in orig_attrs.get(bnds_name, {}).items():
                     variables[bnds_name].attrs.setdefault(attr, val)
 
-    if own_keys is not None:
-        # For DataTree nodes, drop variables/coords inherited from
-        # ancestor groups
-        variables = {k: v for k, v in variables.items() if k in own_keys}
-
     # Only 1-d dimension-matching variables live in "coords"
-    dim_coords = {k: v for k, v in variables.items() if v.dims == (k,)}
-    data_vars = {k: v for k, v in variables.items() if v.dims != (k,)}
+    dim_coords = {key: v for key, v in variables.items() if v.dims == (key,)}
+    data_vars = {key: v for key, v in variables.items() if v.dims != (key,)}
 
     # Create the undecoded dataset
     out = xarray.Dataset(data_vars=data_vars, coords=dim_coords, attrs=attrs)
@@ -254,13 +240,13 @@ def xarray_undecode_cf(ds):
     if isinstance(ds, xarray.Dataset):
         return _undecode_cf_dataset(ds)
 
-    if isinstance(ds, xarray.DataTree):
+    if isinstance(ds, xarray.DataTree):        
         nodes = {
-            node.path: _undecode_cf_dataset(node.to_dataset(inherit=False))
-            for node in ds.subtree
+            path: _undecode_cf_dataset(node.to_dataset(inherit=False))
+            for path, node in ds.subtree_with_keys
         }
         return xarray.DataTree.from_dict(nodes, name=ds.name)
-
+        
     raise TypeError(
         f"Expected xarray.Dataset or xarray.DataTree. Got: {type(ds)!r}"
     )

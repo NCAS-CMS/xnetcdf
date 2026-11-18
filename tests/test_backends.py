@@ -852,3 +852,24 @@ def test_unencode_cf_invalid_type():
     """Raise TypeError for unsupported input types."""
     with pytest.raises(TypeError, match="Dataset or xarray.DataTree"):
         xarray_undecode_cf({"not": "a dataset"})  # type: ignore[arg-type]
+
+def test_unencode_cf_datatree_subtree(data_dir):
+    """unencode_cf on a non-root DataTree node rebases paths to root."""
+    test_nc_path = data_dir / "test.nc"
+    raw_sub = xr.open_datatree(test_nc_path, decode_cf=False)["/forecast"]
+    decoded_sub = xr.open_datatree(test_nc_path, decode_cf=True)["/forecast"]
+
+    reverted_sub = xarray_undecode_cf(decoded_sub)
+
+    assert reverted_sub.name == "forecast"
+    assert [p for p, _ in reverted_sub.subtree_with_keys] == [
+        p for p, _ in raw_sub.subtree_with_keys
+    ]
+
+    for (_, raw_node), (_, rev_node) in zip(
+        raw_sub.subtree_with_keys, reverted_sub.subtree_with_keys
+    ):
+        _assert_datasets_match_raw(
+            rev_node.to_dataset(inherit=False),
+            raw_node.to_dataset(inherit=False),
+        )
