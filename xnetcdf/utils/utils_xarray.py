@@ -85,8 +85,6 @@ def xarray_read(dataset, options):
     dataset_name = None
     protocol = -1
 
-    undecode_cf = True
-
     if isinstance(dataset, (xarray.Dataset, xarray.DataTree)):
         if isinstance(dataset, xarray.Dataset):
             # Convert a Dataset to a DataTree
@@ -105,6 +103,9 @@ def xarray_read(dataset, options):
         if not dataset_name or not isinstance(dataset_name, str):
             dataset_name = "<xarray-like>"
 
+        # We need to reverse any xarray CF decoding
+        undecode_cf = True
+
     else:
         options = options.copy()
         decode_cf = options.pop("decode_cf", False)
@@ -122,7 +123,7 @@ def xarray_read(dataset, options):
         library = xarray
         owns_accessor = True
 
-        # No need to reverse any xarray CF encoding because
+        # No need to reverse any xarray CF decoding because
         # decode_cf=False
         undecode_cf = False
 
@@ -247,19 +248,18 @@ def xarray_undecode_cf(ds):
 
     .. versionadded:: 0.3.0
 
-    .. warning :: If the dataset was opened from disk, then for
-                  optimal performance and minimal memory usage it
-                  should have been opened with ``decode_cf=False`` or
-                  be backed by Dask chunks, neither of which is the
-                  default in `xarray.open_dataset` or
-                  `xarray.open_datatree`. If the input was opened from
-                  disk using ``decode_cf=True`` and without Dask
-                  chunks, then the automatic reversal of xarray's CF
-                  decoding on selected variables (i.e. those with
-                  ``_FillValue`` or ``missing_value`` attributes; or
-                  those decoded into non-numeric time or timedelta
-                  objects) will eagerly load those data arrays into
-                  memory.
+    .. note :: If the dataset was opened from disk, then for optimal
+               performance and minimal memory usage it should have
+               been opened with ``decode_cf=False``, which is **not**
+               the default in `xarray.open_dataset` or
+               `xarray.open_datatree`. If the `xarray` dataset was
+               opened from disk using the default of
+               ``decode_cf=True`` then the automatic reversal of
+               xarray's CF decoding on selected variables (i.e. those
+               with explicit ``_FillValue`` or ``missing_value``
+               attributes; or those decoded into non-numeric time or
+               timedelta objects) will eagerly load those data arrays
+               into memory.
     
     :Parameters:
 

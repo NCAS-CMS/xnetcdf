@@ -1862,15 +1862,15 @@ class Dataset(Group):
     When *dataset* is an `xarray.Dataset` or `xarray.DataTree` object,
     if it was opened from disk then for optimal performance and
     minimal memory usage it should have been opened with
-    ``decode_cf=False`` or be backed by Dask chunks, neither of which
-    is the default in `xarray.open_dataset` or
-    `xarray.open_datatree`. If the input was opened from disk using
-    ``decode_cf=True`` and without Dask chunks, then the automatic
-    reversal of xarray's CF decoding on selected variables (i.e. those
-    with ``_FillValue`` or ``missing_value`` attributes; or those
-    decoded into non-numeric time or timedelta objects) will eagerly
-    load those data arrays into memory. When the `xarray` backend is
-    used internally to open a dataset on disk, it always uses
+    ``decode_cf=False``, which is **not** the default in
+    `xarray.open_dataset` or `xarray.open_datatree`. If the `xarray`
+    dataset was opened from disk using the default of
+    ``decode_cf=True`` then the automatic reversal of xarray's CF
+    decoding on selected variables (i.e. those with explicit
+    ``_FillValue`` or ``missing_value`` attributes; or those decoded
+    into non-numeric time or timedelta objects) will eagerly load
+    those data arrays into memory. When the `xarray` backend is used
+    internally to open a dataset on disk, it always uses
     ``decode_cf=False`` to prevent xarray's CF decoding from
     occurring, thereby removing the need to reverse it.
     
