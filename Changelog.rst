@@ -1,7 +1,7 @@
 Version 0.3.0
 -------------
 
-**2026-11-??**
+**2026-11-20**
 
 * Undecode CF decoding in `xarray` datasets
   (https://github.com/NCAS-CMS/xnetcdf/issues/21)
