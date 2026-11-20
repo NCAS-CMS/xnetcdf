@@ -18,8 +18,8 @@ from .utils import (
     netcdf_file_parse_group_structure,
     netcdf_file_read,
     parse_attributes,
-    umfive_read,
     pyfive_read,
+    umfive_read,
     xarray_parse_group_structure,
     xarray_read,
     zarr_parse_group_structure,
@@ -44,8 +44,8 @@ _read_functions = {
 }
 
 backends = tuple(_read_functions)
-"""Supported backends available for accessing datasets, in the order
-in which access is attempted."""
+"""Supported backends available for accessing datasets, in the order in
+which access is attempted."""
 
 # np.printoptions parameters for `dump` method output (17 significant
 # digits is enough to fully represent every possible bit of precision
@@ -1812,7 +1812,7 @@ class Dataset(Group):
     Supported dataset formats that can be read by at least one of the
     supported backends are: netCDF-4, netCDF-3, Zarr v3, Zarr v2,
     Kerchunk, UK Met Office PP, and UK Met Office fields file.
-    
+
     Additionaly, a dataset may be provided as (a subclass of) any of
     the following backend objects: `pyfive.File`, `zarr.Group`,
     `umfive.File`, `netCDF4.Dataset`, `scipy.io.netcdf_file`,
@@ -1857,6 +1857,23 @@ class Dataset(Group):
     ``_ARRAY_DIMENSIONS``, as well as any attributes that start with
     ``_Netcdf4``, ``_nc``, or ``_NC``.
 
+    :Performance:
+
+    When *dataset* is an `xarray.Dataset` or `xarray.DataTree` object,
+    if it was opened from disk then for optimal performance and
+    minimal memory usage it should have been opened with
+    ``decode_cf=False``, which is **not** the default in
+    `xarray.open_dataset` or `xarray.open_datatree`. If the `xarray`
+    dataset was opened from disk using the default of
+    ``decode_cf=True`` then the automatic reversal of xarray's CF
+    decoding on selected variables (i.e. those with explicit
+    ``_FillValue`` or ``missing_value`` attributes; or those decoded
+    into non-numeric time or timedelta objects) will eagerly load
+    those data arrays into memory. When the `xarray` backend is used
+    internally to open a dataset on disk, it always uses
+    ``decode_cf=False`` to prevent xarray's CF decoding from
+    occurring, thereby removing the need to reverse it.
+    
     :Parameters:
 
         dataset:
@@ -2018,10 +2035,9 @@ class Dataset(Group):
             `xarray.open_datatree` when opening a dataset with the
             ``'xarray'`` backend. Setting to `None` (the default) is
             equivalent to providing an empty dictionary. The keyword
-            arguments ``mask_and_scale=False``, ``decode_cf=False``,
-            and ``chunks='auto'`` are always automatically applied,
-            even when not provided. The ``mask_and_scale`` and
-            ``decode_cf`` arguments can't be set to different values,
+            arguments ``decode_cf=False`` and ``chunks='auto'`` are
+            always automatically applied, even when not provided. The
+            ``decode_cf`` arguments can't be set to a different value,
             but ``chunks`` may be redefined. The ``filename_or_obj``
             argument can not be provided.
 

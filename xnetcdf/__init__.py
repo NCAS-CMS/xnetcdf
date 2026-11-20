@@ -1,7 +1,6 @@
-from .xnetcdf import Dataset, Group, Variable, Dimension, backends
-from importlib.metadata import version
-from importlib.metadata import PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version
 
+from .xnetcdf import Dataset, Dimension, Group, Variable, backends
 
 __date__ = "2026-07-01"
 
