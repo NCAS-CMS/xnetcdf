@@ -63,9 +63,6 @@ supported backends (shown in brackets) are:
 - `Zarr v2 <https://zarr-specs.readthedocs.io/en/latest/v2/v2.0.html>`_ 
   (`zarr`, `netCDF4`, `xarray`)
 - `Kerchunk <https://fsspec.github.io/kerchunk>`_ (`zarr`, `xarray`)
-- `GRIB
-  <https://community.wmo.int/site/knowledge-hub/programmes-and-initiatives/wmo-information-system-wis/about-manual-codes-volume-i2>`_
-  (`xarray`)
 - `UK Met Office PP
   <https://artefacts.ceda.ac.uk/badc_datadocs/um/umdp_F3-UMDPF3.pdf>`_
   (`umfive`)
