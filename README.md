@@ -59,23 +59,18 @@ these backends in turn, in the order given above, returning the
 Supported dataset formats that can be read by at least one of the
 supported backends (shown in brackets) are:
 
-- `netCDF-4
-  <https://docs.unidata.ucar.edu/nug/current/netcdf_introduction.html>`_
+- [netCDF-4](https://docs.unidata.ucar.edu/nug/current/netcdf_introduction.html)
   (`pyfive`, `zarr`, `netCDF4`, `h5py`, `xarray`)
-- `netCDF-3
-  <https://docs.unidata.ucar.edu/nug/current/netcdf_introduction.html>`_
+- [netCDF-3](https://docs.unidata.ucar.edu/nug/current/netcdf_introduction.html)
   (`netCDF4`, `scipy.io.netcdf_file`)
-- `Zarr v3
-  <https://zarr-specs.readthedocs.io/en/latest/specs.html>`_
+- [Zarr v3](https://zarr-specs.readthedocs.io/en/latest/specs.html)
   (`zarr`, `xarray`)
-- `Zarr v2 <https://zarr-specs.readthedocs.io/en/latest/v2/v2.0.html>`_ 
+- [Zarr v2](https://zarr-specs.readthedocs.io/en/latest/v2/v2.0.html)
   (`zarr`, `netCDF4`, `xarray`)
-- `Kerchunk <https://fsspec.github.io/kerchunk>`_ (`zarr`, `xarray`)
-- `UK Met Office PP
-  <https://artefacts.ceda.ac.uk/badc_datadocs/um/umdp_F3-UMDPF3.pdf>`_
+- [Kerchunk](https://fsspec.github.io/kerchunk) (`zarr`, `xarray`)
+- [UK Met Office PP](https://artefacts.ceda.ac.uk/badc_datadocs/um/umdp_F3-UMDPF3.pdf)
   (`umfive`)
-- `UK Met Office fields file
-  <https://artefacts.ceda.ac.uk/badc_datadocs/um/umdp_F3-UMDPF3.pdf>`_
+- [UK Met Office fields file](https://artefacts.ceda.ac.uk/badc_datadocs/um/umdp_F3-UMDPF3.pdf)
   (`umfive`)
 
 ### Dataset definitions
