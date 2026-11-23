@@ -1939,8 +1939,7 @@ class Dataset(Group):
             ``'netcdf_file'``  `scipy.io.netcdf_file`  netCDF-3
             ``'h5py'``         `h5py`                  netCDF-4
             ``'xarray'``       `xarray`                netCDF-4, netCDF-3,
-                                                       Zarr, Kerchunk,
-                                                       GRIB
+                                                       Zarr, Kerchunk
             =================  ======================  ===================
 
             Note that the `xarray` library is itself an interface to
