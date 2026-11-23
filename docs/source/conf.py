@@ -6,6 +6,8 @@
 import os
 import sys
 
+import umfive
+
 sys.path.insert(0, os.path.abspath("../../src"))
 
 # -- Project information -----------------------------------------------------
@@ -14,8 +16,8 @@ sys.path.insert(0, os.path.abspath("../../src"))
 project = "xnetcdf"
 copyright = "2026, xnetcdf Development Team"
 author = "xnetcdf Development Team"
-version = "0.1.0"
-release = "0.1.0"
+version = xnetcdf.__version__
+release = version
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
