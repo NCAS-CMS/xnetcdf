@@ -28,6 +28,8 @@ objects), and attributes. A variable is associated with dimensions and
 may contain attributes; and a group may contain sub-groups,
 dimensions, variables, and attributes.
 
+![Pseudo Class Diagram for xnetcdf](docs/source/_figs/xnetcdf-stack.svg)
+
 ### Backends
 
 `xnetcdf` has no native capability for directly opening a dataset,
