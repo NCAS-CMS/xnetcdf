@@ -115,9 +115,7 @@ def xarray_read(dataset, options):
         if "chunks" not in options:
             options["chunks"] = "auto"
 
-        dataset, dataset_name, protocol = get_dataset_name_and_protocol(
-            dataset
-        )
+        dataset, dataset_name, protocol = get_dataset_name_and_protocol(dataset)
         nc = xarray.open_datatree(dataset, decode_cf=False, **options)
 
         library = xarray
@@ -140,7 +138,6 @@ def xarray_read(dataset, options):
         "library": library,
         "owns_accessor": owns_accessor,
     }
-
 
 
 _CF_ENCODING_KEYS = frozenset({"_FillValue", "missing_value"})
@@ -204,8 +201,7 @@ def _undecode_cf_dataset(ds):
     _update_bounds_encoding(variables)
     for key, var in list(variables.items()):
         is_string = var.dtype.kind in {"U", "S", "T"} or (
-            var.dtype.kind == "O"
-            and check_vlen_dtype(var.dtype) in {str, bytes}
+            var.dtype.kind == "O" and check_vlen_dtype(var.dtype) in {str, bytes}
         )
         if is_string:
             continue
@@ -243,6 +239,7 @@ def _undecode_cf_dataset(ds):
     }
     return out
 
+
 def xarray_undecode_cf(ds):
     """Reverse any effects of `xarray.decode_cf`.
 
@@ -260,7 +257,7 @@ def xarray_undecode_cf(ds):
                attributes; or those decoded into non-numeric time or
                timedelta objects) will eagerly load those data arrays
                into memory.
-    
+
     :Parameters:
 
         ds: `xarray.Dataset` or `xarray.DataTree`
@@ -284,6 +281,4 @@ def xarray_undecode_cf(ds):
         }
         return xarray.DataTree.from_dict(nodes, name=ds.name)
 
-    raise TypeError(
-        f"Expected xarray.Dataset or xarray.DataTree. Got: {type(ds)!r}"
-    )
+    raise TypeError(f"Expected xarray.Dataset or xarray.DataTree. Got: {type(ds)!r}")

@@ -90,9 +90,7 @@ def netCDF4_read(dataset, options):
         if mode != "r":
             raise ValueError(f"Can't set mode={mode!r} in netCDF4_options")
 
-        dataset, dataset_name, protocol = get_dataset_name_and_protocol(
-            dataset
-        )
+        dataset, dataset_name, protocol = get_dataset_name_and_protocol(dataset)
 
         nc = netCDF4.Dataset(dataset, mode="r", **options)
         nc.set_auto_maskandscale(False)

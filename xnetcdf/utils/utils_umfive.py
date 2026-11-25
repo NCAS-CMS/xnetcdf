@@ -69,9 +69,7 @@ def umfive_read(dataset, options):
         if mode != "r":
             raise ValueError(f"Can't set mode={mode!r} in umfive_options")
 
-        dataset, dataset_name, protocol = get_dataset_name_and_protocol(
-            dataset
-        )
+        dataset, dataset_name, protocol = get_dataset_name_and_protocol(dataset)
         nc = umfive.File(dataset, mode="r", **options)
 
         library = umfive
