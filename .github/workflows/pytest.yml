@@ -45,11 +45,10 @@ jobs:
           pip install -e .[test]
       - name: Run pip check
         run: pip check
-      # Pre-commit fails so we need to fix issues with it @davidhassell
-      # - name: Run pre-commit with mypy
-      #   run: |
-      #     pre-commit install
-      #     pre-commit run -a
+      - name: Run pre-commit with mypy
+        run: |
+          pre-commit install
+          pre-commit run -a
       - name: Check environment contents
         run: |
           conda list
