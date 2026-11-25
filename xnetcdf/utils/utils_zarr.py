@@ -101,9 +101,7 @@ def zarr_get_dataset_name(z):
         elif backend_type == "LocalFileSystem":
             # For native local object store, extract the path string
             base_path = getattr(backend, "root", "") or os.getcwd()
-            return join_paths(
-                os.path.abspath(str(base_path)), combined_subpath
-            )
+            return join_paths(os.path.abspath(str(base_path)), combined_subpath)
 
     # Case 6: Fallback for raw strings or customized stores
     path_str = str(z.store_path)
@@ -210,8 +208,7 @@ def zarr_dimension_maps(group):
                     # appropriate order for searching.
                     group_split = group_path.split("/")
                     ancestor_names = [
-                        "/".join(group_split[:n])
-                        for n in range(1, len(group_split))
+                        "/".join(group_split[:n]) for n in range(1, len(group_split))
                     ]
                     ancestor_names[0] = "/"
                     # E.g. if the current group is /g1/g2/g3 then the
@@ -406,9 +403,7 @@ def zarr_read(dataset, options):
         if mode != "r":
             raise ValueError(f"Can't set mode={mode!r} in zarr_options")
 
-        dataset, dataset_name, protocol = get_dataset_name_and_protocol(
-            dataset
-        )
+        dataset, dataset_name, protocol = get_dataset_name_and_protocol(dataset)
         nc = zarr.open(dataset, mode="r", **options)
 
         library = zarr

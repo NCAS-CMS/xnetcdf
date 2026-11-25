@@ -109,9 +109,7 @@ def netcdf_file_read(dataset, options):
         if not mmap:
             raise ValueError("Can't set mmap=False in netcdf_file_options")
 
-        dataset, dataset_name, protocol = get_dataset_name_and_protocol(
-            dataset
-        )
+        dataset, dataset_name, protocol = get_dataset_name_and_protocol(dataset)
         nc = netcdf_file(dataset, mode="r", mmap=True, **options)
 
         library = netcdf_file

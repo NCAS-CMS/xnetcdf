@@ -48,9 +48,7 @@ def h5py_read(dataset, options):
         if mode != "r":
             raise ValueError(f"Can't set mode={mode!r} in h5py_options")
 
-        dataset, dataset_name, protocol = get_dataset_name_and_protocol(
-            dataset
-        )
+        dataset, dataset_name, protocol = get_dataset_name_and_protocol(dataset)
         nc = h5py.File(dataset, mode="r", **options)
 
         library = h5py

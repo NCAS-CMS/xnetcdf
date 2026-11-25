@@ -68,10 +68,7 @@ def cdl_format(g, lines, depth=0):
             # Variable attributes
             for attr, value in var.attrs.items():
                 pfx = "string " if cdl_is_string_list(value) else ""
-                lines.append(
-                    f"{attr_indent}{pfx}{name}:{attr} = "
-                    f"{cdl_value(value)} ;"
-                )
+                lines.append(f"{attr_indent}{pfx}{name}:{attr} = {cdl_value(value)} ;")
 
     # Group attributes
     if g.attrs:

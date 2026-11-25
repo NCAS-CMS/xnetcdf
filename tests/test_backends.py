@@ -210,9 +210,7 @@ def test_zarr3_2(data_dir):
     ):
         assert p1.backend_api == "zarr"
         assert p2.backend_api == "zarr"
-        assert p1.dump(display=False, data=True) == p2.dump(
-            display=False, data=True
-        )
+        assert p1.dump(display=False, data=True) == p2.dump(display=False, data=True)
 
 
 def test_zarr2_1(data_dir):
@@ -268,9 +266,7 @@ def test_zarr2_2(data_dir):
     ):
         assert p1.backend_api == "zarr"
         assert p2.backend_api == "zarr"
-        assert p1.dump(display=False, data=True) == p2.dump(
-            display=False, data=True
-        )
+        assert p1.dump(display=False, data=True) == p2.dump(display=False, data=True)
 
 
 def test_kerchunk(data_dir):
@@ -370,9 +366,7 @@ def test_netcdf_file_2(data_dir):
     ):
         assert p1.backend_api == "netcdf_file"
         assert p2.backend_api == "netcdf_file"
-        assert p1.dump(display=False, data=True) == p2.dump(
-            display=False, data=True
-        )
+        assert p1.dump(display=False, data=True) == p2.dump(display=False, data=True)
 
     x._mm_buf = None
     x.close()
@@ -559,9 +553,7 @@ def test_xarray_2(data_dir):
     import xarray
 
     dataset = data_dir / "test.nc"
-    with xarray.open_datatree(
-        dataset, mask_and_scale=False, decode_cf=False
-    ) as x:
+    with xarray.open_datatree(dataset, mask_and_scale=False, decode_cf=False) as x:
         with (
             xnetcdf.Dataset(dataset, backend="xarray") as p1,
             xnetcdf.Dataset(x, backend="xarray") as p2,
@@ -765,9 +757,7 @@ def test_xarray_undecode_cf_datatree(data_dir):
 
     reverted_dt = xarray_undecode_cf(decoded_dt)
 
-    assert [n.path for n in reverted_dt.subtree] == [
-        n.path for n in raw_dt.subtree
-    ]
+    assert [n.path for n in reverted_dt.subtree] == [n.path for n in raw_dt.subtree]
 
     for raw_node, rev_node in zip(raw_dt.subtree, reverted_dt.subtree):
         raw_ds = raw_node.to_dataset(inherit=False)
@@ -852,6 +842,7 @@ def test_unencode_cf_invalid_type():
     """Raise TypeError for unsupported input types."""
     with pytest.raises(TypeError, match="Dataset or xarray.DataTree"):
         xarray_undecode_cf({"not": "a dataset"})  # type: ignore[arg-type]
+
 
 def test_unencode_cf_datatree_subtree(data_dir):
     """unencode_cf on a non-root DataTree node rebases paths to root."""

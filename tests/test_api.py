@@ -120,10 +120,7 @@ def test_xnetcdf_Dataset_file_like(data_dir):
         xnetcdf.Dataset(file_like) as pfl,
         xnetcdf.Dataset(dataset, backend="pyfive") as p,
     ):
-        assert (
-            pfl["forecast/model/q"].dimensions
-            == p["forecast/model/q"].dimensions
-        )
+        assert pfl["forecast/model/q"].dimensions == p["forecast/model/q"].dimensions
 
 
 def test_xnetcdf_Dataset_pyfive_like(data_dir):
@@ -134,10 +131,7 @@ def test_xnetcdf_Dataset_pyfive_like(data_dir):
         xnetcdf.Dataset(py5_file) as py5,
         xnetcdf.Dataset(dataset, backend="pyfive") as p,
     ):
-        assert (
-            py5["forecast/model/q"].dimensions
-            == p["forecast/model/q"].dimensions
-        )
+        assert py5["forecast/model/q"].dimensions == p["forecast/model/q"].dimensions
 
 
 def test_xnetcdf_Dataset__repr__(data_dir):
@@ -673,9 +667,7 @@ def test_xnetcdf_Variable_backend_accessor(data_dir):
 
     dataset = data_dir / "test.nc"
     with xnetcdf.Dataset(dataset, backend="pyfive") as p:
-        assert isinstance(
-            p["forecast/model/q"].backend_accessor, pyfive.Dataset
-        )
+        assert isinstance(p["forecast/model/q"].backend_accessor, pyfive.Dataset)
 
 
 def test_xnetcdf_Variable_maxshape(data_dir):
@@ -810,9 +802,7 @@ def test_xnetcdf_Variable_get_dims(data_dir):
     dataset = data_dir / "test.nc"
     with xnetcdf.Dataset(dataset, backend="pyfive") as p:
         assert p["/time"].get_dims() == ()
-        assert p["/forecast/lon"].get_dims() == (
-            p["/forecast"].dimensions["lon"],
-        )
+        assert p["/forecast/lon"].get_dims() == (p["/forecast"].dimensions["lon"],)
         assert p["/forecast/model/q"].get_dims() == (
             p["/forecast/model"].dimensions["lat"],
             p["/forecast"].dimensions["lon"],

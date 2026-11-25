@@ -2,7 +2,7 @@ Thank you for taking the time to consider making a contribution to the `xnetcdf`
 
 ## General Guidelines
 
-We greatly value contributions of any kind. Contributions could include, but are not limited to documentation improvements, bug reports, new or improved code, code reviews, infrastructure improvements, outreach improvements, and community help/building. We value the time you invest in contributing and strive to make the process as easy as possible. If you have suggestions for improving the process of contributing, please do not hesitate to propose them. 
+We greatly value contributions of any kind. Contributions could include, but are not limited to documentation improvements, bug reports, new or improved code, code reviews, infrastructure improvements, outreach improvements, and community help/building. We value the time you invest in contributing and strive to make the process as easy as possible. If you have suggestions for improving the process of contributing, please do not hesitate to propose them.
 
 - All questions, reports of bugs, and other suggestions for enhancements should be raised initially as GitHub issues at <https://github.com/NCAS-CMS/xnetcdf/issues>.
 

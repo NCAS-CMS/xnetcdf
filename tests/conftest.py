@@ -40,9 +40,7 @@ def generate_netCDF4_file(data_dir):
         forecast = nc.createGroup("forecast")
         forecast.createDimension("lon", None)  # UNLIMITED
 
-        lon_bnds = forecast.createVariable(
-            "lon_bnds", "f8", ("lon", "bounds2")
-        )
+        lon_bnds = forecast.createVariable("lon_bnds", "f8", ("lon", "bounds2"))
 
         lon = forecast.createVariable("lon", "f8", ("lon",))
         lon.setncattr("units", "degrees_east")

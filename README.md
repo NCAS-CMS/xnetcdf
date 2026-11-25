@@ -80,7 +80,7 @@ dataset definitions:
 
 - A string-like path name to the dataset (such as `str` or
   `pathlib.Path` instance).
-  
+
 - A file-like object that accesses the dataset (such as
   `io.BufferedReader` or the result of an `fsspec` file system open)
 
@@ -102,7 +102,7 @@ dataset definitions:
   passed to `xnetcdf.Dataset`.
 
 ### A simple example
-    
+
 An example of how to use `xnetcdf` to open a dataset and inspect its
 contents:
 
@@ -181,7 +181,7 @@ The library can also be imported directly from the `xnetcdf` source
 root directory:
 
 ``` shell
-$ pip install -e . 
+$ pip install -e .
 ```
 
 ### Conda-forge feedstock
@@ -214,5 +214,5 @@ Build the documentation with `sphinx`:
 $ cd xnetcdf/docs
 $ make html
 ```
-	
+
 View the documentation locally at `xnetcdf/docs/build/html/index.html`.

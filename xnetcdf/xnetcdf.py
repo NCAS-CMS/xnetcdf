@@ -61,7 +61,7 @@ class Mixin:
 
     """
 
-    __hash__ = None
+    __hash__ = None  # type: ignore
 
     # Quantum of indentation for the `dump` method
     __indent = "    "
@@ -276,8 +276,7 @@ class Mixin2:
             return self.attrs[name]
         except KeyError:
             raise AttributeError(
-                f"{self.__class__.__name__!r} object has no attribute "
-                f"{name!r}"
+                f"{self.__class__.__name__!r} object has no attribute {name!r}"
             )
 
     def ncattrs(self):
@@ -599,9 +598,7 @@ class Variable(Mixin, Mixin2):
         """Flag to indicate whether indexing is orthogonal."""
         orthogonal_indexing = getattr(self, "_orthogonal_indexing", None)
         if orthogonal_indexing is None:
-            orthogonal_indexing = getattr(
-                self._var, "__orthogonal_indexing__", False
-            )
+            orthogonal_indexing = getattr(self._var, "__orthogonal_indexing__", False)
             self._orthogonal_indexing = orthogonal_indexing
 
         return orthogonal_indexing
@@ -714,14 +711,7 @@ class Variable(Mixin, Mixin2):
         dtype = getattr(self, "_dtype", None)
         if dtype is None:
             match self.backend_api:
-                case (
-                    "pyfive"
-                    | "zarr"
-                    | "netCDF4"
-                    | "h5py"
-                    | "xarray"
-                    | "umfive"
-                ):
+                case "pyfive" | "zarr" | "netCDF4" | "h5py" | "xarray" | "umfive":
                     dtype = self._var.dtype
 
                 case "netcdf_file":
@@ -729,8 +719,7 @@ class Variable(Mixin, Mixin2):
 
                 case _:
                     raise NotImplementedError(
-                        "Need to implement 'dtype' for backend API"
-                        f"{self.backend_api!r}"
+                        f"Need to implement 'dtype' for backend API{self.backend_api!r}"
                     )
 
             if dtype is not str and dtype != np.dtypes.StringDType():
@@ -757,8 +746,7 @@ class Variable(Mixin, Mixin2):
         maxshape = getattr(self, "_maxshape", None)
         if maxshape is None:
             maxshape = tuple(
-                None if dim.isunlimited() else dim.size
-                for dim in self.get_dims()
+                None if dim.isunlimited() else dim.size for dim in self.get_dims()
             )
             self._maxshape = maxshape
 
@@ -988,15 +976,12 @@ class Variable(Mixin, Mixin2):
             if not _structure and self.attrs:
                 lines.append(f"{i1}Attributes:")
                 lines.extend(
-                    f"{i2}{name}: {value!r}"
-                    for name, value in self.attrs.items()
+                    f"{i2}{name}: {value!r}" for name, value in self.attrs.items()
                 )
 
             if data:
                 lines.append(f"{i1}Data {self.dtype.name}:")
-                data_string = np.array2string(
-                    self[...], separator=", ", prefix=i2
-                )
+                data_string = np.array2string(self[...], separator=", ", prefix=i2)
                 lines.append(f"{i2}{data_string}")
 
         out = "\n".join(lines)
@@ -1040,9 +1025,7 @@ class Variable(Mixin, Mixin2):
                     dims = [dimensions[dim] for dim in self._var.dimensions]
 
                 case "xarray":
-                    dims = get_dimensions_from_defining_group(
-                        self, self._var.dims
-                    )
+                    dims = get_dimensions_from_defining_group(self, self._var.dims)
 
                 case "zarr":
                     raise RuntimeError(
@@ -1625,8 +1608,7 @@ class Group(Mixin, Mixin2, Mapping):
             with np.printoptions(**printoptions):
                 lines.append(f"{i1}Attributes:")
                 lines.extend(
-                    f"{i2}{name}: {value!r}"
-                    for name, value in self.attrs.items()
+                    f"{i2}{name}: {value!r}" for name, value in self.attrs.items()
                 )
 
         # Dimensions
@@ -1668,9 +1650,7 @@ class Group(Mixin, Mixin2, Mapping):
                     for group in self.groups.values()
                 )
             else:
-                lines.extend(
-                    f"{i2}{group!r}" for group in self.groups.values()
-                )
+                lines.extend(f"{i2}{group!r}" for group in self.groups.values())
 
         out = "\n".join(lines)
         if not display:
@@ -1787,7 +1767,7 @@ class Group(Mixin, Mixin2, Mapping):
 
 # Set __Group to `Group`, now that `Group` has been defined. This
 # references is used to create sub-groups in `Group._create_group`.
-Group._Group__Group = Group
+Group._Group__Group = Group  # type: ignore
 
 
 class Dataset(Group):
@@ -1873,7 +1853,7 @@ class Dataset(Group):
     internally to open a dataset on disk, it always uses
     ``decode_cf=False`` to prevent xarray's CF decoding from
     occurring, thereby removing the need to reverse it.
-    
+
     :Parameters:
 
         dataset:
@@ -2179,9 +2159,7 @@ class Dataset(Group):
                     if nc["owns_accessor"]
                     else "Using existing object"
                 )
-                self._dataset_read_log.append(
-                    f"{backend}: {message} {dataset!r}"
-                )
+                self._dataset_read_log.append(f"{backend}: {message} {dataset!r}")
                 break
 
         if nc is None:

@@ -1,84 +1,53 @@
-# Configure pre-commit hooks to check for Python code validity, formatting and
-# style issues and prompt for these to be corrected before committing.
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+---
+ci:
+  autofix_prs: false
 
-# Excludes for *all* pre-commit hooks as listed below:
-# (these are documentation files, either old ones or aut-generated ones)
-exclude: docs\/1\..*\d\/|docs\/_downloads\/|docs\/.*\/tutorial\.py
+exclude: |
+  (?x)
+  .readthedocs.yaml|
+  codecov.yml|
+  ^.github/|
+  ^doc/|
+  ^docs/|
+  ^tests/data/|
+  ^joss_paper/
 
 repos:
-
-  # Use specific format-enforcing pre-commit hooks from the core library
-  # with the default configuration (see pre-commit.com for documentation)
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v6.0.0
     hooks:
+      - id: check-added-large-files
+        exclude: ^tests/data/(cmip_bad_eg\.nc|Data_20230106_01_014\.mat)$
       - id: check-ast
+      - id: check-case-conflict
+      - id: check-merge-conflict
       - id: debug-statements
       - id: end-of-file-fixer
-        types: [python]
       - id: trailing-whitespace
-        types: [python]
-
-  # Also validate against 'black' for unambiguous Python formatting
-  # (see https://black.readthedocs.io/en/stable/ for documentation and see
-  # the cfdm pyproject.toml file for our custom black configuration)
-  - repo: https://github.com/ambv/black
-    rev: 24.4.2
+        args: [--markdown-linebreak-ext=md]
+  - repo: https://github.com/adrienverge/yamllint
+    rev: 'v1.38.0'
     hooks:
-      - id: black
-        language_version: python3
-        args: [--line-length=79]
-
-  # Also format docstrings in a consistent way, on top of 'black' requirements
-  # with the aim to auto-correct towards the Google docstring format (see
-  # https://google.github.io/styleguide/pyguide.html#381-docstrings) as much
-  # as possible (see https://github.com/myint/docformatter for docs, with
-  # configuration as below)
-#  - repo: https://github.com/myint/docformatter
-  - repo: https://github.com/PyCQA/docformatter
-    rev: v1.7.6
+      - id: yamllint
+  # codespell is always iffy; we can turn it on if we want to
+  # - repo: https://github.com/codespell-project/codespell
+  #   rev: 'v2.4.1'
+  #   hooks:
+  #     - id: codespell
+  #       additional_dependencies: [tomli]  # required for Python 3.10
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.17.2"
     hooks:
-      - id: docformatter
-        # These arguments act as the configuration for docformatter. They:
-        # * make docformatter auto-format in-place if not compliant;
-        # * ensure there is a blank line after the final non-empty line;
-        # * wraps both summary and description at 72 characters (the latter
-        #   by default).
-        args: [--in-place, --blank, --wrap-summaries=72]
-
-  # Check the docstrings conforms to Google docstring format as much as can
-  # be detected by the 'pydocstyle' checker
-  # (see http://www.pydocstyle.org/en/stable/index.html for
-  # docs and see the cfdm .pydocstyle.ini file for our custom configuration)
-  - repo: https://github.com/PyCQA/pydocstyle
-    rev: 6.3.0
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 'v2.4.0'
     hooks:
-      - id: pydocstyle
-
-  # Additionally validate againt flake8 for other Python style enforcement
-  # (see https://flake8.pycqa.org/en/latest/ for documentation and see
-  # the cfdm .flake8 file for our custom flake8 configuration)
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.0
-    hooks:
-      - id: flake8
-        args: [--max-line-length=79]
-
-  # Apply the 'isort' tool to sort Python import statements systematically
-  # (see https://pycqa.github.io/isort/ for documentation). It is fully
-  # compatible with 'black' with the lines set to ensure so in the repo's
-  # pyproject.toml. Other than that and the below, no extra config is required.
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        name: isort (python)
-        args: [--profile=black, --line-length=79]
-      - id: isort
-        name: isort (cython)
-        types: [cython]
-        args: [--profile=black, --line-length=79]
-      - id: isort
-        name: isort (pyi)
-        types: [pyi]
-        args: [--profile=black, --line-length=79]
+      - id: mypy
+        additional_dependencies:
+          - 'types-PyYAML'
+          - 'types-requests'
+          - 'numpy'

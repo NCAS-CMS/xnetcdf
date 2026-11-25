@@ -118,9 +118,7 @@ def hdf5_parse_group_structure(group):
                 "id": dim_id,
                 "size": shape[0],
                 "is_unlimited": is_unlimited,
-                "is_stub": (
-                    b"not a netCDF variable" in attrs.get("NAME", b"")
-                ),
+                "is_stub": (b"not a netCDF variable" in attrs.get("NAME", b"")),
             }
 
     # Sort and create Dimension objects
