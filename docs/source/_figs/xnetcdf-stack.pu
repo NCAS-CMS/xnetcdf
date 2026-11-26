@@ -1,0 +1,197 @@
+@startuml
+allowmixing
+'skinparam linetype ortho
+skinparam fontsize 16
+skinparam notefontsize 20
+
+skinparam classFontsize 16
+skinparam classAttributeFontsize 16
+skinparam classMethodFontsize 12
+skinparam packagefontsize 18
+skinparam notebackgroundcolor beige
+hide circle
+skinparam classHeaderBackgroundColor #Green
+skinparam classFontColor #white
+skinparam classFontColor<<DataFile>> #black
+'skinparam classFontColor<<external>> #black
+skinparam classHeaderBackgroundColor<<DataFile>> #azure
+skinparam classHeaderBackgroundColor<<Interface>> #darkblue
+'skinparam classHeaderBackgroundColor<<external>> #gold
+hide <<interface>> stereotype
+hide <<external>> stereotype
+hide <<DataFile>> members
+
+package "xnetcdf stack" {
+
+    
+
+    class xnetcdf.Dataset {
+        + file: **DataFile** | **URL**
+        (quacks like netcdf4)
+    }
+
+
+    class pyfive.File {
+        + file: **HDF5File**
+        (quacks like h5py - with extras)
+    }
+
+    class zarr.load <<external>> {
+        + store: **ZarrFile**
+        (ZarrFiles are folders of files)
+    }
+
+    class umfive.File {
+        + file: **ppfile** | **fieldsfile**
+        (quacks like pyfive instance)
+    }
+
+    class netcdf4_python.Dataset <<external>> {
+        + file: **OpenDAPURL**
+        (Not normally needed for NetCDF4 files
+        unless specified as the backend)
+    }
+
+    class scipy.netcdf_file <<external>>{
+        + file: **NetCDF3File**
+        (legacy NetCDF3 files)
+    }
+
+    class h5py.File <<external>> {
+        + file: **HDF5File**
+        (Should only be needed for writing
+        unless specified as priority backend)
+    }
+
+    pyfive -[hidden] zarr 
+    zarr -[hidden] umfive
+
+    note as N2
+    By default, **xnetcdf.Dataset** will 
+    attempt to open files using the backends 
+    listed below, starting with pyfive, and 
+    progressing  via zarr, umfive, ..., 
+    to xarray. However, the user can override
+    this by specifying a backend explicitly.
+    end note
+
+
+    class xarray.Dataset <<external>> {
+        + file: **GRIBFile** | **KerchunkFile** | URL
+        (Not needed for other file types)
+    }
+
+  
+   
+
+    N2 . xnetcdf.Dataset
+    N2 .[hidden]. pyfive.File
+
+
+ 
+
+
+    xnetcdf.Dataset --> pyfive.File
+    xnetcdf.Dataset --> zarr.load
+    xnetcdf.Dataset --> umfive.File
+    xnetcdf.Dataset --> netcdf4_python.Dataset
+    xnetcdf.Dataset --> scipy.netcdf_file
+    xnetcdf.Dataset --> h5py.File
+    xnetcdf.Dataset --> xarray.Dataset
+
+    pyfive.File -[hidden]- zarr.load
+    umfive.File -[hidden]- zarr.load
+
+    umfive.File -[hidden]- netcdf4_python.Dataset
+    scipy.netcdf_file -[hidden]- netcdf4_python.Dataset
+
+    scipy.netcdf_file -[hidden]- h5py.File
+    xarray.Dataset -[hidden]- h5py.File
+}
+
+
+@enduml
+
+@startuml
+skinparam fontsize 16
+skinparam notefontsize 20
+
+skinparam classFontsize 16
+skinparam classAttributeFontsize 16
+skinparam classMethodFontsize 12
+skinparam packagefontsize 18
+hide circle
+skinparam notebackgroundcolor beige
+skinparam classHeaderBackgroundColor #Green
+skinparam classFontColor #white
+skinparam classFontColor<<DataFile>> #black
+skinparam classFontColor<<external>> #black
+skinparam classHeaderBackgroundColor<<DataFile>> #azure
+skinparam classHeaderBackgroundColor<<Interface>> #darkblue
+skinparam classHeaderBackgroundColor<<external>> #FFFFCC
+hide <<interface>> stereotype
+hide <<external>> stereotype
+hide <<DataFile>> members
+
+package "formats and interfaces" {
+
+    class OpenDap <<interface>> {
+        + URI: URL 
+        (opens remote netcdf3/4)
+    }
+
+    class POSIX <<interface>> {
+        +file: filename
+        (access to all filetypes)
+    }
+
+    class FSSpec <<interface>> {
+        + URI: URL 
+        (access to all filetypes,
+        only efficient routes shown) 
+    }
+
+    dataclass  NetCDF3 <<DataFile>>
+    dataclass  GRIB <<DataFile>> 
+    dataclass  pp <<DataFile>>
+    dataclass  NetCDF4 <<DataFile>>
+    dataclass  HDF5 <<DataFile>>
+    dataclass  Kerchunk <<DataFile>>
+    dataclass  fieldsfile <<DataFile>>
+    dataclass  Zarr <<DataFile>>
+    
+
+    HDF5 <|- NetCDF4
+
+    OpenDap --> NetCDF3
+    OpenDap --> NetCDF4
+    POSIX --> NetCDF3
+    POSIX --> NetCDF4
+    POSIX --> GRIB
+    POSIX --> pp
+    POSIX --> HDF5
+    POSIX --> Kerchunk
+    POSIX --> fieldsfile
+    POSIX --> Zarr
+    FSSpec --> HDF5 : "(cloud\noptimised)"
+    FSSpec --> Kerchunk
+    FSSpec --> fieldsfile
+    FSSpec --> Zarr
+    Kerchunk --> HDF5
+   
+
+note as N1
+While FSSPEC makes any remote file look like local POSIX, it is only efficient for
+Zarr, fieldsfiles, and either cloud optimised HFD5 (& NetCDF4) or HDF5 
+(& NetCDF4) mediated by kerchunk descriptors.
+end note
+
+fieldsfile .. N1
+HDF5 .. N1
+Zarr .. N1
+
+
+}
+
+
+@enduml
